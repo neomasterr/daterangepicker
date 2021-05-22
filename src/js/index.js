@@ -1,7 +1,13 @@
-console.log('qwe');
+function DateRangePicker($element, options = {}) {
+    this.options = {
 
-function DateRangePicker() {
+    }
 
+    this.init = function() {
+
+    }
+
+    this.init();
 }
 
 export default DateRangePicker;

@@ -16,6 +16,8 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
+            filename: 'index.html',
+            template: 'src/html/index.html',
             title: 'DateRangePicker',
         }),
         new MiniCssExtractPlugin({
@@ -26,7 +28,7 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.s?[ac]ss$/i,
+                test: /\.css|sass|scss$/i,
                 use: [
                     MiniCssExtractPlugin.loader,
                     'css-loader',
