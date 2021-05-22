@@ -8,6 +8,13 @@ module.exports = {
             './src/scss/index.scss',
             './src/js/index.js',
         ],
+        'demo/page': {
+            import: [
+                './src/demo/page.scss',
+                './src/demo/page.js',
+            ],
+            filename: './demo/page.js',
+        },
     },
     output: {
         filename: '[name].js',
@@ -16,8 +23,8 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            filename: 'index.html',
-            template: 'src/html/index.html',
+            filename: './demo/index.html',
+            template: './src/demo/index.html',
             title: 'DateRangePicker',
         }),
         new MiniCssExtractPlugin({
@@ -36,7 +43,7 @@ module.exports = {
                         loader: 'sass-loader',
                         options: {
                             sassOptions: {
-                                outputStyle: 'compressed',
+                                indentWidth: 4,
                             },
                         },
                     },
