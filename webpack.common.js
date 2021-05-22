@@ -3,7 +3,7 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     entry: {
-        daterangepicker: './src/index.js',
+        daterangepicker: './src/js/index.js',
     },
     output: {
         filename: '[name].js',
@@ -18,8 +18,8 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.css$/i,
-                use: ['style-loader', 'css-loader'],
+                test: /\.s?[ac]ss$/i,
+                use: ['style-loader', 'css-loader', 'sass-loader'],
             }
         ],
     },
