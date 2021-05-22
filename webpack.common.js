@@ -1,9 +1,13 @@
 const path = require('path');
-const HTMLWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
-        daterangepicker: './src/js/index.js',
+        daterangepicker: [
+            './src/scss/index.scss',
+            './src/js/index.js',
+        ],
     },
     output: {
         filename: '[name].js',
@@ -11,15 +15,30 @@ module.exports = {
         clean: true,
     },
     plugins: [
-        new HTMLWebpackPlugin({
+        new HtmlWebpackPlugin({
             title: 'DateRangePicker',
+        }),
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[name].chunk.css',
         }),
     ],
     module: {
         rules: [
             {
                 test: /\.s?[ac]ss$/i,
-                use: ['style-loader', 'css-loader', 'sass-loader'],
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader',
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            sassOptions: {
+                                outputStyle: 'compressed',
+                            },
+                        },
+                    },
+                ],
             }
         ],
     },
