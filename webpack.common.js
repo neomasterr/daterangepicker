@@ -4,10 +4,17 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     entry: {
-        daterangepicker: [
-            './src/scss/index.scss',
-            './src/js/index.js',
-        ],
+        daterangepicker: {
+            import: [
+                './src/scss/index.scss',
+                './src/js/index.js',
+            ],
+            library: {
+                name: 'Daterangepicker',
+                type: 'umd',
+                umdNamedDefine: true,
+            }
+        },
         'demo/page': {
             import: [
                 './src/demo/page.scss',
