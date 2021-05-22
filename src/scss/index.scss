@@ -1,7 +1,47 @@
+:root {
+    --daterangepicker-day-width: 35px;
+    --daterangepicker-day-height: 35px;
+}
+
 .Daterangepicker {
     display: block;
 
-    width: 300px;
-    height: 300px;
-    background-color: #000;
+    &__months {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .Month {
+        padding: 10px;
+
+        &__title {
+            text-align: center;
+        }
+
+        &__week {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+        }
+
+        &__weekday {
+            padding: 5px;
+        }
+    }
+
+    .Week {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+    }
+
+    .Day {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: var(--daterangepicker-day-width);
+        height: var(--daterangepicker-day-height);
+        cursor: pointer;
+    }
 }

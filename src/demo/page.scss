@@ -3,6 +3,19 @@
     margin: 0;
 }
 
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    background-color: #343D46;
+}
+
+body * {
+    color: #FFFFFF;
+}
+
 .Form {
 
 }
@@ -17,4 +30,8 @@
 
 #daterangepicker {
     position: relative;
+
+    .Day[data-day="6"], .Day[data-day="0"] {
+        color: #f13636;
+    }
 }
