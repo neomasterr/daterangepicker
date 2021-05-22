@@ -122,8 +122,6 @@ function DateRangePicker($container, options = {}) {
         );
 
         const $days = $month.querySelector('.Month__days');
-        const daysInMonth = this.getDaysCountInMonth(date);
-
         const days = new Date(date.getTime());
         days.setDate(1);
         days.setHours(0, 0, 0, 0);
