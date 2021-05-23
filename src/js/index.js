@@ -179,7 +179,7 @@ function DateRangePicker($container, options = {}) {
         $day.addEventListener('click', this._onDayClickEvent.bind(this));
 
         if (!this.options.singleMode) {
-            $day.addEventListener('mousemove', this._onDayMouseMoveEvent.bind(this));
+            $day.addEventListener('mouseenter', this._onDayMouseEnterEvent.bind(this));
         }
 
         return $day;
@@ -197,15 +197,15 @@ function DateRangePicker($container, options = {}) {
      * Событие ховера
      * @param {Event} e DOM событие
      */
-    this._onDayMouseMoveEvent = function(e) {
-        this._onDayMouseMove(e.target);
+    this._onDayMouseEnterEvent = function(e) {
+        this._onDayMouseEnter(e.target);
     }
 
     /**
      * Ховер на элементе дня
      * @param {Element} $day HTML Элемент
      */
-    this._onDayMouseMove = function($day) {
+    this._onDayMouseEnter = function($day) {
         if (!this._selection.$from || this._selection.$to) {
             return;
         }
@@ -289,13 +289,20 @@ function DateRangePicker($container, options = {}) {
         const time_from = date_from.getTime();
         const time_to = date_to.getTime();
         const $days = this._$months.querySelectorAll('.Day[data-time]');
-        $days.forEach($day => {
+
+        let selectedRemoved = false;
+        for (let i = 0; i < $days.length; ++i) {
+            const $day = $days[i];
+
             if ($day.dataset.time > time_from && $day.dataset.time < time_to) {
                 $day.classList.add('is-selected-between');
-            } else {
+            } else if ($day.classList.contains('is-selected-between')) {
                 $day.classList.remove('is-selected-between');
+                selectedRemoved = true;
+            } else if (selectedRemoved) {
+                break;
             }
-        });
+        }
 
         // выделение стартовой и конечной позиции
         const $day_from = this._$getDayByDate(date_from);
