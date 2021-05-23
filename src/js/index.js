@@ -2,11 +2,14 @@ function DateRangePicker($container, options = {}) {
     this._$container = $container;
 
     this.options = {
-        firstDayOfTheWeek: 1, // первый день недели, 0 = вс, 1 = пн, ...
-        monthsCount: 12,
-        locale: 'ru-RU',
-        allowRepick: true, // возможность перевыбора одной даты
-        on: Object.assign({}, options.on || {}),
+        firstDayOfTheWeek: options.firstDayOfTheWeek || 1,       // первый день недели, 0 = вс, 1 = пн, ...
+        monthsCount:       options.monthsCount       || 12,      // количество отображаемых месяцев
+        singleMode:        options.singleMode        || false,   // выбор одной даты вместо диапазона
+        locale:            options.locale            || 'ru-RU',
+        on: Object.assign({
+            rangeSelect: null, // событие выбора диапазона дат
+            daySelect: null,   // событие выбора одной даты (только при singleMode: true)
+        }, options.on || {}),
     }
 
     this.init = function() {
@@ -174,7 +177,10 @@ function DateRangePicker($container, options = {}) {
         );
 
         $day.addEventListener('click', this._onDayClickEvent.bind(this));
-        $day.addEventListener('mousemove', this._onDayMouseMoveEvent.bind(this));
+
+        if (!this.options.singleMode) {
+            $day.addEventListener('mousemove', this._onDayMouseMoveEvent.bind(this));
+        }
 
         return $day;
     }
@@ -219,6 +225,14 @@ function DateRangePicker($container, options = {}) {
      * @param {Element} $day HTML Элемент
      */
     this._onDayClick = function($day) {
+        // выбор одной даты
+        if (this.options.singleMode) {
+            this.rangeReset();
+            $day.classList.add('is-selected');
+            this._callback('daySelect', new Date(parseInt($day.dataset.time, 10)));
+            return;
+        }
+
         if (this._selection.$from && this._selection.$to) {
             this.rangeReset();
         }

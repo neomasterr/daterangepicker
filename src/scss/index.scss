@@ -58,7 +58,7 @@
             pointer-events: none;
         }
 
-        &.is-selected {
+        &:hover, &.is-selected {
             color: var(--daterangepicker-day-selected-color);
             background-color: var(--daterangepicker-day-selected-background);
         }

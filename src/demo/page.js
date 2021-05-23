@@ -10,5 +10,9 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
             $date_from.value = date_from.toLocaleDateString();
             $date_to.value = date_to.toLocaleDateString();
         },
+        daySelect: function(date_from) {
+            console.log("date_from", date_from);
+
+        },
     }
 });
