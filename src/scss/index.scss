@@ -54,6 +54,10 @@
             color: var(--daterangepicker-day-holiday-color);
         }
 
+        &.is-empty {
+            pointer-events: none;
+        }
+
         &.is-selected {
             color: var(--daterangepicker-day-selected-color);
             background-color: var(--daterangepicker-day-selected-background);

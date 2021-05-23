@@ -174,6 +174,7 @@ function DateRangePicker($container, options = {}) {
         );
 
         $day.addEventListener('click', this._onDayClickEvent.bind(this));
+        $day.addEventListener('mousemove', this._onDayMouseMoveEvent.bind(this));
 
         return $day;
     }
@@ -187,6 +188,33 @@ function DateRangePicker($container, options = {}) {
     }
 
     /**
+     * Событие ховера
+     * @param {Event} e DOM событие
+     */
+    this._onDayMouseMoveEvent = function(e) {
+        this._onDayMouseMove(e.target);
+    }
+
+    /**
+     * Ховер на элементе дня
+     * @param {Element} $day HTML Элемент
+     */
+    this._onDayMouseMove = function($day) {
+        if (!this._selection.$from || this._selection.$to) {
+            return;
+        }
+
+        if ($day == this._selection.$from) {
+            return;
+        }
+
+        const date_from = new Date(parseInt(this._selection.$from.dataset.time, 10));
+        const date_to   = new Date(parseInt($day.dataset.time, 10));
+
+        this._rangeVisualSelect(date_from, date_to);
+    }
+
+    /**
      * Клик по дню
      * @param {Element} $day HTML Элемент
      */
@@ -195,19 +223,17 @@ function DateRangePicker($container, options = {}) {
             this.rangeReset();
         }
 
+        $day.classList.add('is-selected');
+
         if (!this._selection.$from) {
             this._selection.$from = $day;
         } else if (!this._selection.$to) {
             this._selection.$to = $day;
         }
 
-        $day.classList.add('is-selected');
-
         if (this._selection.$from && this._selection.$to) {
-
             const date_from = new Date(parseInt(this._selection.$from.dataset.time, 10));
             const date_to   = new Date(parseInt(this._selection.$to.dataset.time, 10));
-
             this.rangeSelect(date_from, date_to);
         }
     }
@@ -216,20 +242,67 @@ function DateRangePicker($container, options = {}) {
      * Сброс выделенных дат
      */
     this.rangeReset = function() {
-        if (this._selection && this._selection.$from) {
-            this._selection.$from.classList.remove('is-selected', 'is-selected-from');
-        }
+        this._rangeVisualReset();
+        this._selection = {};
+    }
 
-        if (this._selection && this._selection.$to) {
-            this._selection.$to.classList.remove('is-selected', 'is-selected-to');
-        }
-
-        const $days = this._$months.querySelectorAll('.Day.is-selected-between');
+    /**
+     * Визуальный сброс выделенных дат
+     */
+    this._rangeVisualReset = function() {
+        const $days = this._$months.querySelectorAll('.Day[data-time]');
         $days.forEach($day => {
-            $day.classList.remove('is-selected-between');
+            $day.classList.remove('is-selected', 'is-selected-from', 'is-selected-to', 'is-selected-between');
+        });
+    }
+
+    /**
+     * Визуальное выделение дат
+     * @param {Date} date_from Начальная дата
+     * @param {Date} date_to   Конечная дата
+     */
+    this._rangeVisualSelect = function(date_from, date_to) {
+        date_from.setHours(0, 0, 0, 0);
+        date_to.setHours(0, 0, 0, 0);
+
+        // выбор дат в обратном порядке
+        if (date_from > date_to) {
+            const swap = date_from;
+            date_from = date_to;
+            date_to = swap;
+        }
+
+        const time_from = date_from.getTime();
+        const time_to = date_to.getTime();
+        const $days = this._$months.querySelectorAll('.Day[data-time]');
+        $days.forEach($day => {
+            if ($day.dataset.time > time_from && $day.dataset.time < time_to) {
+                $day.classList.add('is-selected-between');
+            } else {
+                $day.classList.remove('is-selected-between');
+            }
         });
 
-        this._selection = {};
+        // выделение стартовой и конечной позиции
+        const $day_from = this._$getDayByDate(date_from);
+        const $day_to = this._$getDayByDate(date_to);
+
+        // кеш для быстрого сброса старого выделения
+        if (this._rangeVisualSelect.$day_from_old && this._rangeVisualSelect.$day_from_old != $day_from) {
+            this._rangeVisualSelect.$day_from_old.classList.remove('is-selected', 'is-selected-from');
+        }
+
+        // кеш для быстрого сброса старого выделения
+        if (this._rangeVisualSelect.$day_to_old && this._rangeVisualSelect.$day_to_old != $day_to) {
+            this._rangeVisualSelect.$day_to_old.classList.remove('is-selected', 'is-selected-to');
+        }
+
+        $day_from.classList.add('is-selected', 'is-selected-from');
+        $day_to.classList.add('is-selected', 'is-selected-to');
+
+        // сохранение в кеш
+        this._rangeVisualSelect.$day_from_old = $day_from;
+        this._rangeVisualSelect.$day_to_old = $day_to;
     }
 
     /**
@@ -246,24 +319,27 @@ function DateRangePicker($container, options = {}) {
             const swap = date_from;
             date_from = date_to;
             date_to = swap;
-            this._selection.$from = this._$months.querySelector('.Day[data-time="' + date_from.getTime() + '"]');
-            this._selection.$to = this._$months.querySelector('.Day[data-time="' + date_to.getTime() + '"]');
+            this._selection.$from = this._$getDayByDate(date_from);
+            this._selection.$to = this._$getDayByDate(date_to);
         }
 
         this._selection.$from.classList.add('is-selected', 'is-selected-from');
         this._selection.$to.classList.add('is-selected', 'is-selected-to');
 
-        const time_from = date_from.getTime();
-        const time_to = date_to.getTime();
-        const $days = this._$months.querySelectorAll('.Day[data-time]');
-        $days.forEach($day => {
-            if ($day.dataset.time > time_from && $day.dataset.time < time_to) {
-                $day.classList.add('is-selected-between');
-            }
-        });
+        // выделение элементов
+        this._rangeVisualSelect(date_from, date_to);
 
         // событие
         this._callback('rangeSelect', date_from, date_to);
+    }
+
+    /**
+     * Элемент календарного дня
+     * @param  {Date} date Дата
+     * @return {Element}   HTML элемент
+     */
+    this._$getDayByDate = function(date) {
+        return this._$months.querySelector('.Day[data-time="' + date.getTime() + '"]');
     }
 
     /**
@@ -273,7 +349,7 @@ function DateRangePicker($container, options = {}) {
      */
     this._$createEmptyDay = function() {
         const $day = this._$createElement(
-            `<div class="Day"></div>`
+            `<div class="Day is-empty"></div>`
         );
 
         return $day;
