@@ -5,6 +5,7 @@ function DateRangePicker($container, options = {}) {
         firstDayOfTheWeek: 1, // первый день недели, 0 = вс, 1 = пн, ...
         monthsCount: 12,
         locale: 'ru-RU',
+        allowRepick: true, // возможность перевыбора одной даты
     }
 
     this.init = function() {
@@ -27,6 +28,9 @@ function DateRangePicker($container, options = {}) {
 
         // рендер
         this._$container.appendChild(this._$picker);
+
+        // инициализация состояний
+        this.rangeReset();
     }
 
     /**
@@ -168,7 +172,96 @@ function DateRangePicker($container, options = {}) {
             `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
         );
 
+        $day.addEventListener('click', this._onDayClickEvent.bind(this));
+
         return $day;
+    }
+
+    /**
+     * Событие клика по дню
+     * @param {Event} e DOM событие
+     */
+    this._onDayClickEvent = function(e) {
+        this._onDayClick(e.target);
+    }
+
+    /**
+     * Клик по дню
+     * @param {Element} $day HTML Элемент
+     */
+    this._onDayClick = function($day) {
+        if (this._selection.$from && this._selection.$to) {
+            this.rangeReset();
+        }
+
+        if (!this._selection.$from) {
+            this._selection.$from = $day;
+        } else if (!this._selection.$to) {
+            this._selection.$to = $day;
+        }
+
+        $day.classList.add('is-selected');
+
+        if (this._selection.$from && this._selection.$to) {
+
+            const date_from = new Date(parseInt(this._selection.$from.dataset.time, 10));
+            const date_to   = new Date(parseInt(this._selection.$to.dataset.time, 10));
+
+            this.rangeSelect(date_from, date_to);
+        }
+    }
+
+    /**
+     * Сброс выделенных дат
+     */
+    this.rangeReset = function() {
+        if (this._selection && this._selection.$from) {
+            this._selection.$from.classList.remove('is-selected', 'is-selected-from');
+        }
+
+        if (this._selection && this._selection.$to) {
+            this._selection.$to.classList.remove('is-selected', 'is-selected-to');
+        }
+
+        const $days = this._$months.querySelectorAll('.Day.is-selected-between');
+        $days.forEach($day => {
+            $day.classList.remove('is-selected-between');
+        });
+
+        this._selection = {};
+    }
+
+    /**
+     * Выделение диапазона дат
+     * @param {Date} date_from Начальная дата
+     * @param {Date} date_to   Конечная дата
+     */
+    this.rangeSelect = function(date_from, date_to) {
+        date_from.setHours(0, 0, 0, 0);
+        date_to.setHours(0, 0, 0, 0);
+
+        // выбор дат в обратном порядке
+        if (date_from > date_to) {
+            const swap = date_from;
+            date_from = date_to;
+            date_to = swap;
+            this._selection.$from = this._$months.querySelector('.Day[data-time="' + date_from.getTime() + '"]');
+            this._selection.$to = this._$months.querySelector('.Day[data-time="' + date_to.getTime() + '"]');
+        }
+
+        this._selection.$from.classList.add('is-selected', 'is-selected-from');
+        this._selection.$to.classList.add('is-selected', 'is-selected-to');
+
+        const time_from = date_from.getTime();
+        const time_to = date_to.getTime();
+        const $days = this._$months.querySelectorAll('.Day[data-time]');
+        $days.forEach($day => {
+            if ($day.dataset.time > time_from && $day.dataset.time < time_to) {
+                $day.classList.add('is-selected-between');
+            }
+        });
+
+        console.log("date_from, date_to", date_from, date_to);
     }
 
     /**

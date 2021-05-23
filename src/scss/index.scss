@@ -1,6 +1,10 @@
 :root {
     --daterangepicker-day-width: 35px;
     --daterangepicker-day-height: 35px;
+    --daterangepicker-day-holiday-color: #F13636;
+    --daterangepicker-day-selected-color: #FFFFFF;
+    --daterangepicker-day-selected-background: #0089fd;
+    --daterangepicker-day-selected-between-background: rgba(0, 137, 253, 0.3);
 }
 
 .Daterangepicker {
@@ -44,6 +48,20 @@
         width: var(--daterangepicker-day-width);
         height: var(--daterangepicker-day-height);
         cursor: pointer;
+        user-select: none;
+
+        &:nth-child(6), &:nth-child(7) {
+            color: var(--daterangepicker-day-holiday-color);
+        }
+
+        &.is-selected {
+            color: var(--daterangepicker-day-selected-color);
+            background-color: var(--daterangepicker-day-selected-background);
+        }
+
+        &.is-selected-between {
+            background-color: var(--daterangepicker-day-selected-between-background);
+        }
     }
 
     @media screen and (max-width: 960px) {
