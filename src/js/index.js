@@ -318,8 +318,13 @@ function DateRangePicker($container, options = {}) {
             this._rangeVisualSelect.$day_to_old.classList.remove('is-selected', 'is-selected-to');
         }
 
-        $day_from.classList.add('is-selected', 'is-selected-from');
-        $day_to.classList.add('is-selected', 'is-selected-to');
+        if ($day_from) {
+            $day_from.classList.add('is-selected', 'is-selected-from');
+        }
+
+        if ($day_to) {
+            $day_to.classList.add('is-selected', 'is-selected-to');
+        }
 
         // сохранение в кеш
         this._rangeVisualSelect.$day_from_old = $day_from;
@@ -344,8 +349,13 @@ function DateRangePicker($container, options = {}) {
             this._selection.$to = this._$getDayByDate(date_to);
         }
 
-        this._selection.$from.classList.add('is-selected', 'is-selected-from');
-        this._selection.$to.classList.add('is-selected', 'is-selected-to');
+        if (this._selection.$from) {
+            this._selection.$from.classList.add('is-selected', 'is-selected-from');
+        }
+
+        if (this._selection.$to) {
+            this._selection.$to.classList.add('is-selected', 'is-selected-to');
+        }
 
         // выделение элементов
         this._rangeVisualSelect(date_from, date_to);
