@@ -13,6 +13,7 @@
 
     .Month {
         padding: 10px;
+        width: calc(var(--daterangepicker-day-width) * 7);
 
         &__title {
             text-align: center;
@@ -43,5 +44,12 @@
         width: var(--daterangepicker-day-width);
         height: var(--daterangepicker-day-height);
         cursor: pointer;
+    }
+
+    @media screen and (max-width: 960px) {
+        &__months {
+            flex-direction: column;
+            align-items: center;
+        }
     }
 }

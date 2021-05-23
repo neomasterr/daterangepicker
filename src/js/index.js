@@ -165,7 +165,7 @@ function DateRangePicker($container, options = {}) {
      */
     this._$createDay = function(date) {
         const $day = this._$createElement(
-            `<div class="Day" data-day="${date.getDay()}">${date.getDate()}</div>`
+            `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
         );
 
         return $day;
