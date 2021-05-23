@@ -6,6 +6,7 @@ function DateRangePicker($container, options = {}) {
         monthsCount: 12,
         locale: 'ru-RU',
         allowRepick: true, // возможность перевыбора одной даты
+        on: Object.assign({}, options.on || {}),
     }
 
     this.init = function() {
@@ -261,7 +262,8 @@ function DateRangePicker($container, options = {}) {
             }
         });
 
-        console.log("date_from, date_to", date_from, date_to);
+        // событие
+        this._callback('rangeSelect', date_from, date_to);
     }
 
     /**
@@ -286,6 +288,18 @@ function DateRangePicker($container, options = {}) {
         const div = document.createElement('div');
         div.insertAdjacentHTML('afterbegin', html);
         return div.children.length > 1 ? div.children : div.firstElementChild;
+    }
+
+    /**
+     * Safe вызов внешних событий компонента
+     * @param {String} f Имя события
+     */
+    this._callback = function(f) {
+        if (typeof this.options.on[f] == 'function') {
+            return this.options.on[f].apply(this, [].slice.call(arguments, 1));
+        }
+
+        return;
     }
 
     this.init();

@@ -12,8 +12,14 @@ body {
     background-color: #343D46;
 }
 
-body * {
-    color: #FFFFFF;
+body {
+    div, span {
+        color: #FFFFFF;
+    }
+}
+
+input {
+    padding: 5px;
 }
 
 .Form {
