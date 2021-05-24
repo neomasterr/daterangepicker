@@ -6,6 +6,7 @@ function DateRangePicker($container, options = {}) {
         monthsCount:       options.monthsCount       || 12,      // количество отображаемых месяцев
         singleMode:        options.singleMode        || false,   // выбор одной даты вместо диапазона
         locale:            options.locale            || 'ru-RU',
+        minDays:           options.minDays           || 1,       // минимальное количество дней в диапазоне
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
             daySelect: null,   // событие выбора одной даты (только при singleMode: true)
@@ -233,12 +234,14 @@ function DateRangePicker($container, options = {}) {
             return;
         }
 
+        // сброс выбранного ранее диапазона
         if (this._selection.$from && this._selection.$to) {
             this.rangeReset();
         }
 
         $day.classList.add('is-selected');
 
+        // выбрана начальная / конечная дата
         if (!this._selection.$from) {
             this._selection.$from = $day;
         } else if (!this._selection.$to) {
@@ -248,6 +251,14 @@ function DateRangePicker($container, options = {}) {
         if (this._selection.$from && this._selection.$to) {
             const date_from = new Date(parseInt(this._selection.$from.dataset.time, 10));
             const date_to   = new Date(parseInt(this._selection.$to.dataset.time, 10));
+
+
+                    // допустимый диапазон
+            if (!this.getIsSelectable(date_from, date_to)) {
+                delete this._selection.$to;
+                return;
+            }
+
             this.rangeSelect(date_from, date_to);
         }
     }
@@ -281,9 +292,7 @@ function DateRangePicker($container, options = {}) {
 
         // выбор дат в обратном порядке
         if (date_from > date_to) {
-            const swap = date_from;
-            date_from = date_to;
-            date_to = swap;
+            [date_from, date_to] = [date_to, date_from];
         }
 
         const time_from = date_from.getTime();
@@ -340,11 +349,14 @@ function DateRangePicker($container, options = {}) {
         date_from.setHours(0, 0, 0, 0);
         date_to.setHours(0, 0, 0, 0);
 
+        // допустимый диапазон
+        if (!this.getIsSelectable(date_from, date_to)) {
+            return;
+        }
+
         // выбор дат в обратном порядке
         if (date_from > date_to) {
-            const swap = date_from;
-            date_from = date_to;
-            date_to = swap;
+            [date_from, date_to] = [date_to, date_from];
             this._selection.$from = this._$getDayByDate(date_from);
             this._selection.$to = this._$getDayByDate(date_to);
         }
@@ -362,6 +374,22 @@ function DateRangePicker($container, options = {}) {
 
         // событие
         this._callback('rangeSelect', date_from, date_to);
+    }
+
+    /**
+     * Проверка возможности выделения дат
+     * @param  {Date date_from Начальная дата
+     * @param  {Date date_to   Конечная дата
+     * @return {Boolean}
+     */
+    this.getIsSelectable = function(date_from, date_to) {
+        // минимальный диапазон
+        const diff = Math.abs(date_from.getTime() - date_to.getTime()) / 1000 / 86400;
+        if (diff < this.options.minDays) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
