@@ -33,6 +33,7 @@ module.exports = {
             filename: './demo/index.html',
             template: './src/demo/index.html',
             title: 'DateRangePicker',
+            inject: false,
         }),
         new MiniCssExtractPlugin({
             filename: '[name].css',
