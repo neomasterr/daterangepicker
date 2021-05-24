@@ -1,5 +1,8 @@
 @import '../scss/index.scss';
 
+$page-background-color: #343D46;
+$page-hover-color: adjust-color($page-background-color, $lightness: 10%);
+
 * {
     padding: 0;
     margin: 0;
@@ -11,7 +14,7 @@ html, body {
 }
 
 body {
-    background-color: #343D46;
+    background-color: $page-background-color;
 }
 
 body {
@@ -48,6 +51,10 @@ input {
         align-items: center;
         padding: 5px;
         cursor: pointer;
+
+        &:hover {
+            background-color: $page-hover-color;
+        }
     }
 
     span {
