@@ -12,6 +12,11 @@
 
     &__months {
         display: flex;
+        flex-direction: column;
+    }
+
+    &__row {
+        display: flex;
         flex-direction: row;
     }
 
@@ -69,7 +74,7 @@
     }
 
     @media screen and (max-width: 960px) {
-        &__months {
+        &__row {
             flex-direction: column;
             align-items: center;
         }

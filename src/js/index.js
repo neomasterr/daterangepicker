@@ -2,17 +2,43 @@ function DateRangePicker($container, options = {}) {
     this._$container = $container;
 
     this.options = {
-        firstDayOfTheWeek: options.firstDayOfTheWeek || 1,       // первый день недели, 0 = вс, 1 = пн, ...
-        monthsCount:       options.monthsCount       || 12,      // количество отображаемых месяцев
-        singleMode:        options.singleMode        || false,   // выбор одной даты вместо диапазона
+        dateFrom:          options.dateFrom          || new Date(), // начальная дата
+        dateTo:            options.dateTo            || undefined,  // конечная дата
+        firstDayOfTheWeek: options.firstDayOfTheWeek || 1,          // первый день недели, 0 = вс, 1 = пн, ...
+        singleMode:        options.singleMode        || false,      // выбор одной даты вместо диапазона
         locale:            options.locale            || 'ru-RU',
-        minDays:           options.minDays           || 1,       // минимальное количество дней в диапазоне
+        minDays:           options.minDays           || 1,          // минимальное количество дней в диапазоне
+        perRow:            options.perRow            || undefined,  // количество месяцев в ряду
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
             daySelect: null,   // событие выбора одной даты (только при singleMode: true)
         }, options.on || {}),
     }
 
+    // конечная дата
+    if (typeof this.options.dateTo == 'undefined') {
+        const dateTo = new Date(this.options.dateFrom.getTime());
+        dateTo.setFullYear(dateTo.getFullYear() + 1);
+        dateTo.setMonth(dateTo.getMonth() - 1);
+        this.options.dateTo = dateTo;
+    }
+
+    // обратный порядок дат
+    if (this.options.dateFrom > this.options.dateFrom) {
+        [this.options.dateFrom, this.options.dateTo] = [this.options.dateTo, this.options.dateFrom];
+    }
+
+    // количество отображаемых месяцев
+    this.options.monthsCount = (this.options.dateTo.getFullYear() - this.options.dateFrom.getFullYear()) * 12 + (this.options.dateTo.getMonth() - this.options.dateFrom.getMonth()) + 1;
+
+    // рядность
+    if (typeof this.options.perRow == 'undefined') {
+        this.options.perRow = this.options.monthsCount;
+    }
+
+    /**
+     * Инициализация
+     */
     this.init = function() {
         this._$picker = this._$createElement(
             `<div class="Daterangepicker">
@@ -23,10 +49,24 @@ function DateRangePicker($container, options = {}) {
         // элементы
         this._$months = this._$picker.querySelector('.Daterangepicker__months');
 
-        const currentDate = new Date();
+        // пререндер месяцев
+        const currentDate = new Date(this.options.dateFrom.getTime());
+        const $months = [];
         for (let i = 0; i < this.options.monthsCount; ++i) {
-            this._$months.appendChild(this._$createMonth(currentDate));
+            $months.push(this._$createMonth(currentDate));
             currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+
+        // рендер
+        for (let i = 0; i < $months.length; i += this.options.perRow) {
+            const $row = document.createElement('div');
+            $row.className = 'Daterangepicker__row';
+
+            $months.slice(i, i + this.options.perRow).forEach($month => {
+                $row.appendChild($month);
+            });
+
+            this._$months.appendChild($row);
         }
 
         // события
