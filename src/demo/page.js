@@ -5,6 +5,7 @@ const $date_from = $form.querySelector('[name="date_from"]')
 const $date_to   = $form.querySelector('[name="date_to"]')
 
 new DateRangePicker(document.querySelector('#daterangepicker'), {
+    monthsCount: 2,
     perRow: 4,
     on: {
         rangeSelect: function(date_from, date_to) {

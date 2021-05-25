@@ -18,11 +18,51 @@
     &__row {
         display: flex;
         flex-direction: row;
+
+        &:first-child {
+            .Month:first-child {
+                .Month__arrow--prev {
+                    visibility: visible;
+                }
+            }
+        }
+
+        &:last-child {
+            .Month:last-child {
+                .Month__arrow--next {
+                    visibility: visible;
+                }
+            }
+        }
     }
 
     .Month {
         padding: 10px;
         width: calc(var(--daterangepicker-day-width) * 7);
+
+        &__header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        &__arrow {
+            display: flex;
+            padding: 5px 10px;
+            margin: 0px 20px;
+            cursor: pointer;
+            user-select: none;
+            visibility: hidden;
+
+            &--prev {
+
+            }
+
+            &--next {
+
+            }
+        }
 
         &__title {
             text-align: center;
