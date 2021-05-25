@@ -112,11 +112,29 @@
             background-color: var(--daterangepicker-day-selected-between-background);
         }
     }
+}
 
-    @media screen and (max-width: 960px) {
+@media screen and (max-width: 960px) {
+    .Daterangepicker {
         &__row {
             flex-direction: column;
             align-items: center;
+
+            &:first-child {
+                .Month:first-child {
+                    .Month__arrow--prev {
+                        visibility: hidden;
+                    }
+                }
+            }
+
+            &:last-child {
+                .Month:last-child {
+                    .Month__arrow--next {
+                        visibility: hidden;
+                    }
+                }
+            }
         }
     }
 }
