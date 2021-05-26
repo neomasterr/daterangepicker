@@ -20,17 +20,17 @@
         flex-direction: row;
 
         &:first-child {
-            .Month:first-child {
-                .Month__arrow--prev {
-                    visibility: visible;
+            .Month {
+                &:first-child {
+                    .Month__arrow--prev {
+                        visibility: visible;
+                    }
                 }
-            }
-        }
 
-        &:last-child {
-            .Month:last-child {
-                .Month__arrow--next {
-                    visibility: visible;
+                &:last-child {
+                    .Month__arrow--next {
+                        visibility: visible;
+                    }
                 }
             }
         }
@@ -121,17 +121,17 @@
             align-items: center;
 
             &:first-child {
-                .Month:first-child {
-                    .Month__arrow--prev {
-                        visibility: hidden;
+                .Month {
+                    &:first-child {
+                        .Month__arrow--prev {
+                            visibility: hidden;
+                        }
                     }
-                }
-            }
 
-            &:last-child {
-                .Month:last-child {
-                    .Month__arrow--next {
-                        visibility: hidden;
+                    &:last-child {
+                        .Month__arrow--next {
+                            visibility: hidden;
+                        }
                     }
                 }
             }

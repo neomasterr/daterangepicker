@@ -10,7 +10,7 @@ function isMobile() {
 
 new DateRangePicker(document.querySelector('#daterangepicker'), {
     monthsCount: isMobile() ? 12 : 2,
-    perRow: 4,
+    perRow: 3,
     on: {
         rangeSelect: function(date_from, date_to) {
             $date_from.value = date_from.toLocaleDateString();
