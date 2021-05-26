@@ -1,8 +1,8 @@
 import DateRangePicker from '../../dist/daterangepicker';
 
 const $form = document.forms[0];
-const $date_from = $form.querySelector('[name="date_from"]')
-const $date_to   = $form.querySelector('[name="date_to"]')
+const $date_from = $form.querySelector('[name="date_from"]');
+const $date_to   = $form.querySelector('[name="date_to"]');
 
 new DateRangePicker(document.querySelector('#daterangepicker'), {
     monthsCount: 2,
