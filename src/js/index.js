@@ -146,6 +146,10 @@ function DateRangePicker($container, options = {}) {
 
             this._$months.appendChild($row);
         }
+
+        if (this._selection && this._selection.date_from && this._selection.date_to) {
+            this._rangeVisualSelect(this._selection.date_from, this._selection.date_to);
+        }
     }
 
     this._$createMonth = function(date) {
@@ -275,18 +279,17 @@ function DateRangePicker($container, options = {}) {
      * @param {Element} $day HTML Элемент
      */
     this._onDayMouseEnter = function($day) {
-        if (!this._selection.$from || this._selection.$to) {
+        if (!this._selection.date_from || this._selection.date_to) {
             return;
         }
 
-        if ($day == this._selection.$from) {
+        if ($day.dataset.time == this._selection.date_from.getTime()) {
             return;
         }
 
-        const date_from = new Date(parseInt(this._selection.$from.dataset.time, 10));
-        const date_to   = new Date(parseInt($day.dataset.time, 10));
+        const date_to = new Date(parseInt($day.dataset.time, 10));
 
-        this._rangeVisualSelect(date_from, date_to);
+        this._rangeVisualSelect(this._selection.date_from, date_to);
     }
 
     /**
@@ -303,30 +306,27 @@ function DateRangePicker($container, options = {}) {
         }
 
         // сброс выбранного ранее диапазона
-        if (this._selection.$from && this._selection.$to) {
+        if (this._selection.date_from && this._selection.date_to) {
             this.rangeReset();
         }
 
         $day.classList.add('is-selected');
 
         // выбрана начальная / конечная дата
-        if (!this._selection.$from) {
-            this._selection.$from = $day;
-        } else if (!this._selection.$to) {
-            this._selection.$to = $day;
+        if (!this._selection.date_from) {
+            this._selection.date_from = new Date(parseInt($day.dataset.time, 10));
+        } else if (!this._selection.date_to) {
+            this._selection.date_to = new Date(parseInt($day.dataset.time, 10));
         }
 
-        if (this._selection.$from && this._selection.$to) {
-            const date_from = new Date(parseInt(this._selection.$from.dataset.time, 10));
-            const date_to   = new Date(parseInt(this._selection.$to.dataset.time, 10));
-
+        if (this._selection.date_from && this._selection.date_to) {
             // допустимый диапазон
-            if (!this.getIsSelectable(date_from, date_to)) {
-                delete this._selection.$to;
+            if (!this.getIsSelectable(this._selection.date_from, this._selection.date_to)) {
+                delete this._selection.date_to;
                 return;
             }
 
-            this.rangeSelect(date_from, date_to);
+            this.rangeSelect(this._selection.date_from, this._selection.date_to);
         }
     }
 
@@ -421,19 +421,21 @@ function DateRangePicker($container, options = {}) {
             return;
         }
 
+        let $day_from, $day_to;
+
         // выбор дат в обратном порядке
         if (date_from > date_to) {
             [date_from, date_to] = [date_to, date_from];
-            this._selection.$from = this._$getDayByDate(date_from);
-            this._selection.$to = this._$getDayByDate(date_to);
+            $day_from = this._$getDayByDate(date_from);
+            $day_to = this._$getDayByDate(date_to);
         }
 
-        if (this._selection.$from) {
-            this._selection.$from.classList.add('is-selected', 'is-selected-from');
+        if ($day_from) {
+            $day_from.classList.add('is-selected', 'is-selected-from');
         }
 
-        if (this._selection.$to) {
-            this._selection.$to.classList.add('is-selected', 'is-selected-to');
+        if ($day_to) {
+            $day_to.classList.add('is-selected', 'is-selected-to');
         }
 
         // выделение элементов
