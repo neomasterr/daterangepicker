@@ -4,8 +4,12 @@ const $form = document.forms[0];
 const $date_from = $form.querySelector('[name="date_from"]');
 const $date_to   = $form.querySelector('[name="date_to"]');
 
+function isMobile() {
+    return window.innerWidth <= 960;
+}
+
 new DateRangePicker(document.querySelector('#daterangepicker'), {
-    monthsCount: 2,
+    monthsCount: isMobile() ? 12 : 2,
     perRow: 4,
     on: {
         rangeSelect: function(date_from, date_to) {
