@@ -34,15 +34,12 @@ function DateRangePicker($container, options = {}) {
         // элементы
         this._$months = this._$picker.querySelector('.Daterangepicker__months');
 
-        this._$createMonths(this.options.minDate, null);
-
-        // события
-
-        // рендер
-        this._$container.appendChild(this._$picker);
-
         // инициализация состояний
         this.rangeReset();
+
+        // рендер
+        this._$createMonths(this.options.minDate);
+        this._$container.appendChild(this._$picker);
     }
 
     /**
@@ -122,7 +119,11 @@ function DateRangePicker($container, options = {}) {
         return days.getDate();
     }
 
-    this._$createMonths = function(date_from, date_to) {
+    /**
+     * Рендер диапазона месяцев
+     * @param {Date} date_from Начальная дата
+     */
+    this._$createMonths = function(date_from) {
         while (this._$months.lastElementChild) {
             this._$months.removeChild(this._$months.lastElementChild);
         }
@@ -152,6 +153,10 @@ function DateRangePicker($container, options = {}) {
         }
     }
 
+    /**
+     * Рендер месяца
+     * @param {Date} date Месяц
+     */
     this._$createMonth = function(date) {
         const currentMonth = date.getMonth();
         const monthTitle = this.getMonthFormatted(date);
