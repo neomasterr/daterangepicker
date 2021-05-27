@@ -371,21 +371,12 @@ function DateRangePicker($container, options = {}) {
         const time_to = date_to.getTime();
         const $days = this._$months.querySelectorAll('.Day[data-time]');
 
-        let selectedRemoved = false;
+        // выделение дат между начальной и конечной
         for (let i = 0; i < $days.length; ++i) {
-            const $day = $days[i];
-
-            if ($day.dataset.time > time_from && $day.dataset.time < time_to) {
-                $day.classList.add('is-selected-between');
-            } else if ($day.classList.contains('is-selected-between')) {
-                $day.classList.remove('is-selected-between');
-                selectedRemoved = true;
-            } else if (selectedRemoved) {
-                break;
-            }
+            $day.classList.toggle('is-selected-between', $days[i].dataset.time > time_from && $days[i].dataset.time < time_to);
         }
 
-        // выделение стартовой и конечной позиции
+        // выделение начальной и конечной позиции
         const $day_from = this._$getDayByDate(date_from);
         const $day_to = this._$getDayByDate(date_to);
 
