@@ -373,7 +373,7 @@ function DateRangePicker($container, options = {}) {
 
         // выделение дат между начальной и конечной
         for (let i = 0; i < $days.length; ++i) {
-            $day.classList.toggle('is-selected-between', $days[i].dataset.time > time_from && $days[i].dataset.time < time_to);
+            $days[i].classList.toggle('is-selected-between', $days[i].dataset.time > time_from && $days[i].dataset.time < time_to);
         }
 
         // выделение начальной и конечной позиции
