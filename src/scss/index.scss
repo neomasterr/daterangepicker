@@ -94,6 +94,7 @@
         height: var(--daterangepicker-day-height);
         cursor: pointer;
         user-select: none;
+        box-sizing: border-box;
 
         &:nth-child(6), &:nth-child(7) {
             color: var(--daterangepicker-day-holiday-color);
@@ -103,7 +104,12 @@
             pointer-events: none;
         }
 
-        &:hover, &.is-selected {
+        &:hover {
+            color: var(--daterangepicker-day-selected-color);
+            border: 1px solid var(--daterangepicker-day-selected-background);
+        }
+
+        &.is-selected {
             color: var(--daterangepicker-day-selected-color);
             background-color: var(--daterangepicker-day-selected-background);
         }
