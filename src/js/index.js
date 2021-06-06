@@ -148,7 +148,7 @@ function DateRangePicker($container, options = {}) {
             this._$months.appendChild($row);
         }
 
-        if (this._selection && this._selection.date_from && this._selection.date_to) {
+        if (this._selection && (this._selection.date_from || this._selection.date_to)) {
             this._rangeVisualSelect(this._selection.date_from, this._selection.date_to);
         }
     }
@@ -359,16 +359,21 @@ function DateRangePicker($container, options = {}) {
      * @param {Date} date_to   Конечная дата
      */
     this._rangeVisualSelect = function(date_from, date_to) {
-        date_from.setHours(0, 0, 0, 0);
-        date_to.setHours(0, 0, 0, 0);
+        if (date_from && date_from instanceof Date) {
+            date_from.setHours(0, 0, 0, 0);
+        }
+
+        if (date_to && date_to instanceof Date) {
+            date_to.setHours(0, 0, 0, 0);
+        }
 
         // выбор дат в обратном порядке
         if (date_from > date_to) {
             [date_from, date_to] = [date_to, date_from];
         }
 
-        const time_from = date_from.getTime();
-        const time_to = date_to.getTime();
+        const time_from = date_from instanceof Date ? date_from.getTime() : 0;
+        const time_to = date_to instanceof Date ? date_to.getTime() : 0;
         const $days = this._$months.querySelectorAll('.Day[data-time]');
 
         // выделение дат между начальной и конечной
@@ -463,7 +468,8 @@ function DateRangePicker($container, options = {}) {
      * @return {Element}   HTML элемент
      */
     this._$getDayByDate = function(date) {
-        return this._$months.querySelector('.Day[data-time="' + date.getTime() + '"]');
+        const time = date instanceof Date ? date.getTime() : 0;
+        return this._$months.querySelector('.Day[data-time="' + time + '"]');
     }
 
     /**
