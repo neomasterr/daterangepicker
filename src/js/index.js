@@ -170,7 +170,7 @@ function DateRangePicker($container, options = {}) {
                             <path d="M7 13L1 7L7 1" stroke="#8C8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
                     </div>
-                    <div class="Month__title">${monthTitle}</div>
+                    <div class="Month__title">${monthTitle} ${date.getFullYear()}</div>
                     <div class="Month__arrow Month__arrow--next">
                         <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1 0.999999L7 7L1 13" stroke="#8C8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -228,6 +228,20 @@ function DateRangePicker($container, options = {}) {
     this._onArrowClick = function($arrow, name) {
         const date = new Date(parseInt(this._$months.querySelector('.Month').dataset.time, 10));
         date.setMonth(date.getMonth() + (name == 'prev' ? -this.options.monthsCount : this.options.monthsCount));
+
+        // выход за пределы минимальной даты
+        if (date.getTime() < this.options.minDate.getTime()) {
+            date.setTime(this.options.minDate.getTime());
+        }
+
+        // выход за пределы максимальной даты
+        const endDate = new Date(date.getTime());
+        endDate.setMonth(endDate.getMonth() + this.options.monthsCount);
+        if (endDate.getTime() > this.options.maxDate.getTime()) {
+            date.setTime(this.options.maxDate.getTime());
+            date.setMonth(date.getMonth() - this.options.monthsCount + 1);
+        }
+
         this._$createMonths(date);
     }
 

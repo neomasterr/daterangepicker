@@ -9,7 +9,9 @@ function isMobile() {
 }
 
 new DateRangePicker(document.querySelector('#daterangepicker'), {
-    monthsCount: isMobile() ? 12 : 2,
+    minDate: new Date(),
+    maxDate: new Date('2022-05-20'),
+    monthsCount: isMobile() ? 12 : 5,
     perRow: 3,
     on: {
         rangeSelect: function(date_from, date_to) {
