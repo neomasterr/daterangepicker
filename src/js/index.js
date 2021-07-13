@@ -3,7 +3,6 @@ export const LOCK_UNAVAILABLE = 1;
 export const LOCK_LOCKED      = 2;
 
 function DateRangePicker($container, options = {}) {
-
     this._$container = $container;
 
     this.options = {
@@ -275,7 +274,7 @@ function DateRangePicker($container, options = {}) {
         const locked = this.getDayLocked(date);
 
         const $day = this._$createElement(
-            `<div class="Day${locked == LOCK_LOCKED ? ' is-locked' : ''}" data-time="${date.getTime()}" data-day="${date.getDay()}"${locked ? ' disabled' : ''}>${date.getDate()}</div>`
+            `<div class="Day${locked ? ' is-disabled' : ''}${locked == LOCK_LOCKED ? ' is-locked' : ''}" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
         );
 
         $day.addEventListener('click', this._onDayClickEvent.bind(this));
@@ -327,7 +326,7 @@ function DateRangePicker($container, options = {}) {
      */
     this._onDayClick = function($day) {
         // день заблокирован
-        if ($day.hasAttribute('disabled')) {
+        if ($day.classList.contains('is-disabled')) {
             return false;
         }
 

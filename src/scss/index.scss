@@ -104,7 +104,7 @@
             color: var(--daterangepicker-day-holiday-color);
         }
 
-        &[disabled] {
+        &.is-disabled {
             color: var(--daterangepicker-day-disabled-color);
             cursor: default;
 
