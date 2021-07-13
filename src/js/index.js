@@ -26,10 +26,18 @@ function DateRangePicker($container, options = {}) {
         this.options.perRow = this.options.monthsCount;
     }
 
+    if (this.options.minDate) {
+        this.options.minDate.setHours(0, 0, 0, 0);
+    }
+
     /**
      * Инициализация
      */
     this.init = function() {
+        // текущий день
+        this._today = new Date();
+        this._today.setHours(0, 0, 0, 0);
+
         this._$picker = this._$createElement(
             `<div class="Daterangepicker">
                 <div class="Daterangepicker__months"></div>
@@ -276,9 +284,15 @@ function DateRangePicker($container, options = {}) {
      */
     this._$createDay = function(date) {
         const locked = this.getDayLocked(date);
+        const today  = this._today.getTime() == date.getTime();
+
+        let className = '';
+        className += locked ? ' is-disabled' : '';
+        className += locked == LOCK_LOCKED ? ' is-locked' : '';
+        className += today ? ' is-today' : '';
 
         const $day = this._$createElement(
-            `<div class="Day${locked ? ' is-disabled' : ''}${locked == LOCK_LOCKED ? ' is-locked' : ''}" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
+            `<div class="Day${className}" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
         );
 
         $day.addEventListener('click', this._onDayClickEvent.bind(this));

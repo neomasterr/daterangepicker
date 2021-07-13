@@ -121,6 +121,10 @@
             &:nth-child(6), &:nth-child(7) {
                 color: var(--daterangepicker-day-disabled-holiday-color);
             }
+
+            &.is-today {
+                color: var(--daterangepicker-day-disabled-holiday-color);
+            }
         }
 
         &.is-empty {
@@ -143,6 +147,10 @@
 
         &.is-locked {
             text-decoration: line-through;
+        }
+
+        &.is-today {
+            color: var(--daterangepicker-day-holiday-color);
         }
     }
 }
