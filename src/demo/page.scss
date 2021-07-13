@@ -1,6 +1,7 @@
 @import '../scss/index.scss';
 
 $page-background-color: #343D46;
+$page-text-color: #FFFFFF;
 $page-hover-color: adjust-color($page-background-color, $lightness: 10%);
 
 * {
@@ -11,6 +12,7 @@ $page-hover-color: adjust-color($page-background-color, $lightness: 10%);
 html, body {
     width: 100%;
     height: 100%;
+    font-family: 'PT Sans', sans-serif;
 }
 
 body {
@@ -19,7 +21,7 @@ body {
 
 body {
     div, span {
-        color: #FFFFFF;
+        color: $page-text-color;
     }
 }
 
