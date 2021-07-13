@@ -1,6 +1,7 @@
 :root {
     --daterangepicker-day-width: 35px;
     --daterangepicker-day-height: 35px;
+    --daterangepicker-day-color: #FFFFFF;
     --daterangepicker-day-holiday-color: #F13636;
     --daterangepicker-day-selected-color: #FFFFFF;
     --daterangepicker-day-selected-background: #0089fd;
@@ -95,9 +96,16 @@
         cursor: pointer;
         user-select: none;
         box-sizing: border-box;
+        color: var(--daterangepicker-day-color);
 
         &:nth-child(6), &:nth-child(7) {
             color: var(--daterangepicker-day-holiday-color);
+        }
+
+        &[disabled] {
+            opacity: 0.5;
+            cursor: default;
+            pointer-events: none;
         }
 
         &.is-empty {

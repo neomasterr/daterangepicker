@@ -235,11 +235,13 @@ function DateRangePicker($container, options = {}) {
         }
 
         // выход за пределы максимальной даты
-        const endDate = new Date(date.getTime());
-        endDate.setMonth(endDate.getMonth() + this.options.monthsCount);
-        if (endDate.getTime() > this.options.maxDate.getTime()) {
-            date.setTime(this.options.maxDate.getTime());
-            date.setMonth(date.getMonth() - this.options.monthsCount + 1);
+        if (this.options.maxDate) {
+            const endDate = new Date(date.getTime());
+            endDate.setMonth(endDate.getMonth() + this.options.monthsCount);
+            if (endDate.getTime() > this.options.maxDate.getTime()) {
+                date.setTime(this.options.maxDate.getTime());
+                date.setMonth(date.getMonth() - this.options.monthsCount + 1);
+            }
         }
 
         this._$createMonths(date);
@@ -265,7 +267,7 @@ function DateRangePicker($container, options = {}) {
      */
     this._$createDay = function(date) {
         const $day = this._$createElement(
-            `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
+            `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}"${this.getDayAvailable(date) ? '' : ' disabled'}>${date.getDate()}</div>`
         );
 
         $day.addEventListener('click', this._onDayClickEvent.bind(this));
@@ -340,7 +342,7 @@ function DateRangePicker($container, options = {}) {
 
         if (this._selection.date_from && this._selection.date_to) {
             // допустимый диапазон
-            if (!this.getIsSelectable(this._selection.date_from, this._selection.date_to)) {
+            if (!this.getIsRangeSelectable(this._selection.date_from, this._selection.date_to)) {
                 delete this._selection.date_to;
                 return;
             }
@@ -466,13 +468,36 @@ function DateRangePicker($container, options = {}) {
      * @param  {Date date_to   Конечная дата
      * @return {Boolean}
      */
-    this.getIsSelectable = function(date_from, date_to) {
+    this.getIsRangeSelectable = function(date_from, date_to) {
         // минимальный диапазон
         const diff = Math.abs(date_from.getTime() - date_to.getTime()) / 1000 / 86400;
         if (diff < this.options.minDays) {
             return false;
         }
 
+    /**
+     * Проверка на доступность дня для брони
+     * @param  {Date} date Дата
+     * @return {Boolean}   true если доступен
+     */
+    this.getDayAvailable = function(date) {
+        // машина времени ещё не изобретена
+        if (date < this.options.minDate || date > this.options.maxDate) {
+            return false;
+        }
+
+        // не работает в эти дни
+        if (this._availableDates && !this._availableDates[date]) {
+            return false;
+        }
+
+        // забронировано
+        if (this._bookingDates[date]) {
+            return false;
+        }
+
+        return true;
+    }
         return true;
     }
 
