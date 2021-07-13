@@ -1,4 +1,9 @@
+// состояния заблокированных дат
+export const LOCK_UNAVAILABLE = 1;
+export const LOCK_LOCKED      = 2;
+
 function DateRangePicker($container, options = {}) {
+
     this._$container = $container;
 
     this.options = {
@@ -10,7 +15,7 @@ function DateRangePicker($container, options = {}) {
         perRow:            options.perRow            || undefined,  // количество месяцев в ряду
         minDate:           options.minDate           || new Date(), // минимальная дата
         maxDate:           options.maxDate           || undefined,
-        lockDaysFilter:    options.lockDaysFilter    || undefined,
+        lockDaysFilter:    options.lockDaysFilter    || undefined,  // callback(date) функция блокирования дат, true/LOCK
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
             daySelect: null,   // событие выбора одной даты (только при singleMode: true)
@@ -231,7 +236,7 @@ function DateRangePicker($container, options = {}) {
         date.setMonth(date.getMonth() + (name == 'prev' ? -this.options.monthsCount : this.options.monthsCount));
 
         // выход за пределы минимальной даты
-        if (date.getTime() < this.options.minDate.getTime()) {
+        if (date < this.options.minDate) {
             date.setTime(this.options.minDate.getTime());
         }
 
@@ -239,7 +244,7 @@ function DateRangePicker($container, options = {}) {
         if (this.options.maxDate) {
             const endDate = new Date(date.getTime());
             endDate.setMonth(endDate.getMonth() + this.options.monthsCount);
-            if (endDate.getTime() > this.options.maxDate.getTime()) {
+            if (endDate > this.options.maxDate) {
                 date.setTime(this.options.maxDate.getTime());
                 date.setMonth(date.getMonth() - this.options.monthsCount + 1);
             }
@@ -267,8 +272,10 @@ function DateRangePicker($container, options = {}) {
      * @return {Element}
      */
     this._$createDay = function(date) {
+        const locked = this.getDayLocked(date);
+
         const $day = this._$createElement(
-            `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}"${this.getDayAvailable(date) ? '' : ' disabled'}>${date.getDate()}</div>`
+            `<div class="Day${locked == LOCK_LOCKED ? ' is-locked' : ''}" data-time="${date.getTime()}" data-day="${date.getDay()}"${locked ? ' disabled' : ''}>${date.getDate()}</div>`
         );
 
         $day.addEventListener('click', this._onDayClickEvent.bind(this));
@@ -493,7 +500,7 @@ function DateRangePicker($container, options = {}) {
         day.setTime(date_from.getTime());
 
         while (day < date_to) {
-            if (!this.getDayAvailable(day)) {
+            if (this.getDayLocked(day)) {
                 return false;
             }
 
@@ -508,17 +515,17 @@ function DateRangePicker($container, options = {}) {
      * @param  {Date} date Дата
      * @return {Boolean}   true если доступен
      */
-    this.getDayAvailable = function(date) {
+    this.getDayLocked = function(date) {
         // выбор дат вне доступного диапазона
         if (date < this.options.minDate || date > this.options.maxDate) {
-            return false;
+            return LOCK_UNAVAILABLE;
         }
 
         if (this.options.lockDaysFilter) {
             return this.options.lockDaysFilter(date);
         }
 
-        return true;
+        return false;
     }
 
     /**

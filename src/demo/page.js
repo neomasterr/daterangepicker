@@ -1,4 +1,5 @@
 import DateRangePicker from '../../dist/daterangepicker';
+import {LOCK_UNAVAILABLE, LOCK_LOCKED} from '../../dist/daterangepicker';
 
 const $form = document.forms[0];
 const $date_from = $form.querySelector('[name="date_from"]');
@@ -34,6 +35,10 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
         },
     },
     lockDaysFilter: function(day) {
-        return !blockedDates[day];
+        if (blockedDates[day]) {
+            return LOCK_LOCKED;
+        }
+
+        return false;
     }
 });

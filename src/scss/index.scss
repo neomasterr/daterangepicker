@@ -135,6 +135,10 @@
         &.is-selected-between {
             background-color: var(--daterangepicker-day-selected-between-background);
         }
+
+        &.is-locked {
+            text-decoration: line-through;
+        }
     }
 }
 
