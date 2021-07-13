@@ -8,6 +8,17 @@ function isMobile() {
     return window.innerWidth <= 960;
 }
 
+// заблокированные даты
+const blockedDates = {};
+const date = new Date();
+date.setHours(0, 0, 0, 0);
+for (let i = 0; i < 60; ++i) {
+    if (Math.random() > 0.6) {
+        blockedDates[date] = true;
+    }
+    date.setDate(date.getDate() + 1);
+}
+
 new DateRangePicker(document.querySelector('#daterangepicker'), {
     minDate: new Date(),
     maxDate: new Date('2022-05-20'),
@@ -19,11 +30,10 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
             $date_to.value = date_to.toLocaleDateString();
         },
         daySelect: function(date_from) {
-            console.log("date_from", date_from);
 
         },
     },
     lockDaysFilter: function(day) {
-        return day.getDate() % 4;
+        return !blockedDates[day];
     }
 });
