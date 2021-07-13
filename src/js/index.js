@@ -3,37 +3,42 @@ export const LOCK_UNAVAILABLE = 1;
 export const LOCK_LOCKED      = 2;
 
 function DateRangePicker($container, options = {}) {
-    this._$container = $container;
-
-    this.options = {
-        firstDayOfTheWeek: options.firstDayOfTheWeek || 1,          // первый день недели, 0 = вс, 1 = пн, ...
-        singleMode:        options.singleMode        || false,      // выбор одной даты вместо диапазона
-        locale:            options.locale            || 'ru-RU',
-        minDays:           options.minDays           || 1,          // минимальное количество дней в диапазоне
-        monthsCount:       options.monthsCount       || 12,
-        perRow:            options.perRow            || undefined,  // количество месяцев в ряду
-        minDate:           options.minDate           || new Date(), // минимальная дата
-        maxDate:           options.maxDate           || undefined,
-        lockDaysFilter:    options.lockDaysFilter    || undefined,  // callback(date) функция блокирования дат, true/LOCK
-        on: Object.assign({
-            rangeSelect: null, // событие выбора диапазона дат
-            daySelect: null,   // событие выбора одной даты (только при singleMode: true)
-        }, options.on || {}),
-    }
-
-    // рядность
-    if (typeof this.options.perRow == 'undefined') {
-        this.options.perRow = this.options.monthsCount;
-    }
-
-    if (this.options.minDate) {
-        this.options.minDate.setHours(0, 0, 0, 0);
-    }
-
     /**
      * Инициализация
      */
     this.init = function() {
+        this._$container = $container;
+
+        this.options = {
+            firstDayOfTheWeek: options.firstDayOfTheWeek || 1,          // первый день недели, 0 = вс, 1 = пн, ...
+            singleMode:        options.singleMode        || false,      // выбор одной даты вместо диапазона
+            locale:            options.locale            || 'ru-RU',
+            minDays:           options.minDays           || 1,          // минимальное количество дней в диапазоне
+            monthsCount:       options.monthsCount       || 12,
+            perRow:            options.perRow            || undefined,  // количество месяцев в ряду
+            minDate:           options.minDate           || new Date(), // минимальная дата
+            maxDate:           options.maxDate           || undefined,
+            // события
+            on: Object.assign({
+                rangeSelect: null, // событие выбора диапазона дат
+                daySelect:   null, // событие выбора одной даты (только при singleMode: true)
+            }, options.on || {}),
+            // фильтрующие методы
+            filter: Object.assign({
+                lockDays:    this._filterLockDays,    // callback(date) функция блокирования дат, true/LOCK
+                tooltipText: this._filterTooltipText, // callback(days) вывод текста подсказки
+            }, options.filter || {}),
+        }
+
+        // рядность
+        if (typeof this.options.perRow == 'undefined') {
+            this.options.perRow = this.options.monthsCount;
+        }
+
+        if (this.options.minDate) {
+            this.options.minDate.setHours(0, 0, 0, 0);
+        }
+
         // текущий день
         this._today = new Date();
         this._today.setHours(0, 0, 0, 0);
@@ -41,11 +46,13 @@ function DateRangePicker($container, options = {}) {
         this._$picker = this._$createElement(
             `<div class="Daterangepicker">
                 <div class="Daterangepicker__months"></div>
+                <div class="Daterangepicker__tooltip"></div>
             </div>`
         );
 
         // элементы
-        this._$months = this._$picker.querySelector('.Daterangepicker__months');
+        this._$months  = this._$picker.querySelector('.Daterangepicker__months');
+        this._$tooltip = this._$picker.querySelector('.Daterangepicker__tooltip');
 
         // инициализация состояний
         this.rangeReset();
@@ -334,8 +341,10 @@ function DateRangePicker($container, options = {}) {
         }
 
         const date_to = new Date(parseInt($day.dataset.time, 10));
-
         this._rangeVisualSelect(this._selection.date_from, date_to);
+
+        const days = Math.floor(Math.abs(this._selection.date_from.getTime() - date_to.getTime()) / 86400e3) + 1;
+        this._tooltipShow($day, days);
     }
 
     /**
@@ -397,6 +406,8 @@ function DateRangePicker($container, options = {}) {
         $days.forEach($day => {
             $day.classList.remove('is-selected', 'is-selected-from', 'is-selected-to', 'is-selected-between');
         });
+
+        this._tooltipHide();
     }
 
     /**
@@ -452,6 +463,37 @@ function DateRangePicker($container, options = {}) {
         // сохранение в кеш
         this._rangeVisualSelect.$day_from_old = $day_from;
         this._rangeVisualSelect.$day_to_old = $day_to;
+    }
+
+    /**
+     * Показ подсказки
+     * @param {Element} $day Выбранный день
+     * @param {Number}  days Количество дней
+     */
+    this._tooltipShow = function($day, days) {
+        const rect = $day.getBoundingClientRect();
+
+        this._$tooltip.textContent = this.options.filter.tooltipText.call(this, days);
+        this._$tooltip.classList.add('is-show');
+
+        this._$tooltip.style.top = (rect.top - rect.height - this._$tooltip.offsetHeight) + 'px';
+        this._$tooltip.style.left = (rect.left + rect.width / 2 - this._$tooltip.offsetWidth / 2) + 'px';
+    }
+
+    /**
+     * Скрыть подсказку
+     */
+    this._tooltipHide = function() {
+        this._$tooltip.classList.remove('is-show');
+    }
+
+    /**
+     * Текст подсказки по умолчанию
+     * @param  {Number} days Количество дней
+     * @return {String}
+     */
+    this._filterTooltipText = function(days) {
+        return this.plural(days, ['%d день', '%d дня', '%d дней']).replace('%d', days);
     }
 
     /**
@@ -538,11 +580,26 @@ function DateRangePicker($container, options = {}) {
             return LOCK_UNAVAILABLE;
         }
 
-        if (this.options.lockDaysFilter) {
-            return this.options.lockDaysFilter(date);
-        }
+        return this.options.filter.lockDays.call(this, date);
+    }
 
+    /**
+     * Фильтр недоступных дней по умолчанию
+     * @return {Boolean}
+     */
+    this._filterLockDays = function() {
+        // все дни доступны
         return false;
+    }
+
+    /**
+     * Склонение (1 бобёр, 2 бобра, 5 бобров)
+     * @param  {Number} value Количество
+     * @param  {Array}  forms Массив из 3х элементов, может содержать спецификатор %d для замены
+     * @return {String}
+     */
+    this.plural = function (value, forms) {
+        return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
     }
 
     /**

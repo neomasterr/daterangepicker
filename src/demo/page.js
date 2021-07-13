@@ -35,11 +35,17 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
             $date_from.value = date_from.toLocaleDateString();
         },
     },
-    lockDaysFilter: function(day) {
-        if (blockedDates[day]) {
-            return LOCK_LOCKED;
-        }
+    filter: {
+        lockDays: function(day) {
+            if (blockedDates[day]) {
+                return LOCK_LOCKED;
+            }
 
-        return false;
+            return false;
+        },
+        tooltipText: function(days) {
+            const nights = days - 1;
+            return this.plural(nights, ['%d ночь', '%d ночи', '%d ночей']).replace('%d', nights);
+        }
     }
 });

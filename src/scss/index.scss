@@ -18,6 +18,22 @@
         flex-direction: column;
     }
 
+    &__tooltip {
+        display: none;
+        position: absolute;
+        left: 30px;
+        top: 30px;
+        padding: 4px 8px;
+        font-size: 12px;
+        background-color: #FFF;
+        color: black;
+        border-radius: 3px;
+
+        &.is-show {
+            display: block;
+        }
+    }
+
     &__row {
         display: flex;
         flex-direction: row;
