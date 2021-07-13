@@ -148,6 +148,9 @@ function DateRangePicker($container, options = {}) {
             this._$months.removeChild(this._$months.lastElementChild);
         }
 
+        // прячем подсказку
+        this._tooltipHide();
+
         // пререндер месяцев
         const currentDate = new Date(date_from.getTime());
         const $months = [];
@@ -342,9 +345,6 @@ function DateRangePicker($container, options = {}) {
 
         const date_to = new Date(parseInt($day.dataset.time, 10));
         this._rangeVisualSelect(this._selection.date_from, date_to);
-
-        const days = Math.floor(Math.abs(this._selection.date_from.getTime() - date_to.getTime()) / 86400e3) + 1;
-        this._tooltipShow($day, days);
     }
 
     /**
@@ -407,6 +407,7 @@ function DateRangePicker($container, options = {}) {
             $day.classList.remove('is-selected', 'is-selected-from', 'is-selected-to', 'is-selected-between');
         });
 
+        // прячем подсказку
         this._tooltipHide();
     }
 
@@ -463,6 +464,9 @@ function DateRangePicker($container, options = {}) {
         // сохранение в кеш
         this._rangeVisualSelect.$day_from_old = $day_from;
         this._rangeVisualSelect.$day_to_old = $day_to;
+
+        const days = Math.floor(Math.abs(time_from - time_to) / 86400e3) + 1;
+        this._tooltipShow($day_to, days);
     }
 
     /**
