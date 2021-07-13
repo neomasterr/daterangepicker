@@ -9,7 +9,8 @@ function DateRangePicker($container, options = {}) {
         monthsCount:       options.monthsCount       || 12,
         perRow:            options.perRow            || undefined,  // количество месяцев в ряду
         minDate:           options.minDate           || new Date(), // минимальная дата
-        maxDate:           options.maxDate,
+        maxDate:           options.maxDate           || undefined,
+        lockDaysFilter:    options.lockDaysFilter    || undefined,
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
             daySelect: null,   // событие выбора одной даты (только при singleMode: true)
@@ -434,7 +435,7 @@ function DateRangePicker($container, options = {}) {
         date_to.setHours(0, 0, 0, 0);
 
         // допустимый диапазон
-        if (!this.getIsSelectable(date_from, date_to)) {
+        if (!this.getIsRangeSelectable(date_from, date_to)) {
             return;
         }
 
@@ -475,29 +476,24 @@ function DateRangePicker($container, options = {}) {
             return false;
         }
 
+        return true;
+    }
+
     /**
      * Проверка на доступность дня для брони
      * @param  {Date} date Дата
      * @return {Boolean}   true если доступен
      */
     this.getDayAvailable = function(date) {
-        // машина времени ещё не изобретена
+        // выбор дат вне доступного диапазона
         if (date < this.options.minDate || date > this.options.maxDate) {
             return false;
         }
 
-        // не работает в эти дни
-        if (this._availableDates && !this._availableDates[date]) {
-            return false;
+        if (this.options.lockDaysFilter) {
+            return this.options.lockDaysFilter(date);
         }
 
-        // забронировано
-        if (this._bookingDates[date]) {
-            return false;
-        }
-
-        return true;
-    }
         return true;
     }
 

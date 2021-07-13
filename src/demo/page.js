@@ -22,5 +22,8 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
             console.log("date_from", date_from);
 
         },
+    },
+    lockDaysFilter: function(day) {
+        return Math.random() > 0.5;
     }
 });
