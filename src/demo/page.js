@@ -25,13 +25,14 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
     maxDate: new Date('2022-05-20'),
     monthsCount: isMobile() ? 12 : 2,
     perRow: 3,
+    singleMode: false,
     on: {
         rangeSelect: function(date_from, date_to) {
             $date_from.value = date_from.toLocaleDateString();
             $date_to.value = date_to.toLocaleDateString();
         },
         daySelect: function(date_from) {
-
+            $date_from.value = date_from.toLocaleDateString();
         },
     },
     lockDaysFilter: function(day) {

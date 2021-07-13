@@ -170,13 +170,13 @@ function DateRangePicker($container, options = {}) {
         const $month = this._$createElement(
             `<div class="Month" data-time="${date.getTime()}">
                 <div class="Month__header">
-                    <div class="Month__arrow Month__arrow--prev">
+                    <div class="Month__arrow Month__arrow--prev${(this.options.minDate && date <= this.options.minDate) ? ' is-disabled' : ''}">
                         <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M7 13L1 7L7 1" stroke="#8C8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
                     </div>
                     <div class="Month__title">${monthTitle} ${date.getFullYear()}</div>
-                    <div class="Month__arrow Month__arrow--next">
+                    <div class="Month__arrow Month__arrow--next${(this.options.maxDate && date >= this.options.maxDate) ? ' is-disabled' : ''}">
                         <svg width="8" height="14" viewBox="0 0 8 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M1 0.999999L7 7L1 13" stroke="#8C8C8C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
                         </svg>
@@ -231,6 +231,10 @@ function DateRangePicker($container, options = {}) {
      * @param {String} name    Имя (prev, next)
      */
     this._onArrowClick = function($arrow, name) {
+        if ($arrow.classList.contains('is-disabled')) {
+            return false;
+        }
+
         const date = new Date(parseInt(this._$months.querySelector('.Month').dataset.time, 10));
         date.setMonth(date.getMonth() + (name == 'prev' ? -this.options.monthsCount : this.options.monthsCount));
 
