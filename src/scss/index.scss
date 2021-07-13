@@ -2,7 +2,9 @@
     --daterangepicker-day-width: 35px;
     --daterangepicker-day-height: 35px;
     --daterangepicker-day-color: #FFFFFF;
+    --daterangepicker-day-disabled-color: #505050;
     --daterangepicker-day-holiday-color: #F13636;
+    --daterangepicker-day-disabled-holiday-color: #783c3c;
     --daterangepicker-day-selected-color: #FFFFFF;
     --daterangepicker-day-selected-background: #0089fd;
     --daterangepicker-day-selected-between-background: rgba(0, 137, 253, 0.3);
@@ -103,9 +105,17 @@
         }
 
         &[disabled] {
-            opacity: 0.5;
+            color: var(--daterangepicker-day-disabled-color);
             cursor: default;
-            pointer-events: none;
+
+            &:hover {
+                color: var(--daterangepicker-day-disabled-color);
+                border: none;
+            }
+
+            &:nth-child(6), &:nth-child(7) {
+                color: var(--daterangepicker-day-disabled-holiday-color);
+            }
         }
 
         &.is-empty {

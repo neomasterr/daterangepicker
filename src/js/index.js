@@ -319,6 +319,11 @@ function DateRangePicker($container, options = {}) {
      * @param {Element} $day HTML Элемент
      */
     this._onDayClick = function($day) {
+        // день заблокирован
+        if ($day.hasAttribute('disabled')) {
+            return false;
+        }
+
         // выбор одной даты
         if (this.options.singleMode) {
             this.rangeReset();
@@ -344,7 +349,7 @@ function DateRangePicker($container, options = {}) {
         if (this._selection.date_from && this._selection.date_to) {
             // допустимый диапазон
             if (!this.getIsRangeSelectable(this._selection.date_from, this._selection.date_to)) {
-                delete this._selection.date_to;
+                this.rangeReset();
                 return;
             }
 
@@ -470,10 +475,29 @@ function DateRangePicker($container, options = {}) {
      * @return {Boolean}
      */
     this.getIsRangeSelectable = function(date_from, date_to) {
+        date_from.setHours(0, 0, 0, 0);
+        date_to.setHours(0, 0, 0, 0);
+
+        if (date_from > date_to) {
+            [date_from, date_to] = [date_to, date_from];
+        }
+
         // минимальный диапазон
         const diff = Math.abs(date_from.getTime() - date_to.getTime()) / 1000 / 86400;
         if (diff < this.options.minDays) {
             return false;
+        }
+
+        // проверка попадания в диапазон заблокированных дат
+        const day = new Date();
+        day.setTime(date_from.getTime());
+
+        while (day < date_to) {
+            if (!this.getDayAvailable(day)) {
+                return false;
+            }
+
+            day.setDate(day.getDate() + 1);
         }
 
         return true;

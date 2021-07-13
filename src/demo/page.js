@@ -24,6 +24,6 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
         },
     },
     lockDaysFilter: function(day) {
-        return Math.random() > 0.5;
+        return day.getDate() % 4;
     }
 });
