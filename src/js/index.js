@@ -465,8 +465,10 @@ function DateRangePicker($container, options = {}) {
         this._rangeVisualSelect.$day_from_old = $day_from;
         this._rangeVisualSelect.$day_to_old = $day_to;
 
-        const days = Math.floor(Math.abs(time_from - time_to) / 86400e3) + 1;
-        this._tooltipShow($day_to, days);
+        if ($day_to) {
+            const days = Math.floor(Math.abs(time_from - time_to) / 86400e3) + 1;
+            this._tooltipShow($day_to, days);
+        }
     }
 
     /**
