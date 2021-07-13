@@ -1,5 +1,4 @@
-import DateRangePicker from '../../dist/daterangepicker';
-import {LOCK_UNAVAILABLE, LOCK_LOCKED} from '../../dist/daterangepicker';
+import {default as DateRangePicker, LOCK_UNAVAILABLE, LOCK_LOCKED} from '../../dist/daterangepicker';
 
 const $form = document.forms[0];
 const $date_from = $form.querySelector('[name="date_from"]');
