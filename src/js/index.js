@@ -425,16 +425,14 @@ function DateRangePicker($container, options = {}) {
             date_to.setHours(0, 0, 0, 0);
         }
 
-        // выбор дат в обратном порядке
-        if (date_from > date_to) {
-            [date_from, date_to] = [date_to, date_from];
+        let time_from = date_from instanceof Date ? date_from.getTime() : 0;
+        let time_to = date_to instanceof Date ? date_to.getTime() : 0;
+        if (time_from > time_to) {
+            [time_from, time_to] = [time_to, time_from];
         }
 
-        const time_from = date_from instanceof Date ? date_from.getTime() : 0;
-        const time_to = date_to instanceof Date ? date_to.getTime() : 0;
-        const $days = this._$months.querySelectorAll('.Day[data-time]');
-
         // выделение дат между начальной и конечной
+        const $days = this._$months.querySelectorAll('.Day[data-time]');
         for (let i = 0; i < $days.length; ++i) {
             $days[i].classList.toggle('is-selected-between', $days[i].dataset.time > time_from && $days[i].dataset.time < time_to);
         }
@@ -516,14 +514,8 @@ function DateRangePicker($container, options = {}) {
             return;
         }
 
-        let $day_from, $day_to;
-
-        // выбор дат в обратном порядке
-        if (date_from > date_to) {
-            [date_from, date_to] = [date_to, date_from];
-            $day_from = this._$getDayByDate(date_from);
-            $day_to = this._$getDayByDate(date_to);
-        }
+        const $day_from = this._$getDayByDate(date_from);
+        const $day_to = this._$getDayByDate(date_to);
 
         if ($day_from) {
             $day_from.classList.add('is-selected', 'is-selected-from');
@@ -535,6 +527,11 @@ function DateRangePicker($container, options = {}) {
 
         // выделение элементов
         this._rangeVisualSelect(date_from, date_to);
+
+        // выбор дат в обратном порядке
+        if (date_from > date_to) {
+            [date_from, date_to] = [date_to, date_from];
+        }
 
         // событие
         this._callback('rangeSelect', date_from, date_to);
