@@ -4,10 +4,6 @@ const $form = document.forms[0];
 const $date_from = $form.querySelector('[name="date_from"]');
 const $date_to   = $form.querySelector('[name="date_to"]');
 
-function isMobile() {
-    return window.innerWidth <= 960;
-}
-
 // заблокированные даты
 const blockedDates = {};
 const date = new Date();
@@ -22,9 +18,20 @@ for (let i = 0; i < 60; ++i) {
 new DateRangePicker(document.querySelector('#daterangepicker'), {
     minDate: new Date(),
     maxDate: new Date('2022-05-20'),
-    monthsCount: isMobile() ? 12 : 2,
+    monthsCount: 2,
     perRow: 3,
     singleMode: false,
+    breakpoints: {
+        960: {
+            monthsCount: 12,
+        },
+        720: {
+            monthsCount: 3,
+        },
+        480: {
+            monthsCount: 1,
+        },
+    },
     on: {
         rangeSelect: function(date_from, date_to) {
             $date_from.value = date_from.toLocaleDateString();

@@ -18,6 +18,7 @@ function DateRangePicker($container, options = {}) {
             perRow:            options.perRow            || undefined,  // количество месяцев в ряду
             minDate:           options.minDate           || new Date(), // минимальная дата
             maxDate:           options.maxDate           || undefined,
+            breakpoints:       options.breakpoints       || {},
             // события
             on: Object.assign({
                 rangeSelect: null, // событие выбора диапазона дат
@@ -39,6 +40,9 @@ function DateRangePicker($container, options = {}) {
             this.options.minDate.setHours(0, 0, 0, 0);
         }
 
+        // опции для экранов по умолчанию
+        this.options.breakpoints[this._breakpoint = 0] = Object.assign({}, this.options);
+
         // текущий день
         this._today = new Date();
         this._today.setHours(0, 0, 0, 0);
@@ -58,8 +62,14 @@ function DateRangePicker($container, options = {}) {
         this.rangeReset();
 
         // рендер
-        this._$createMonths(this.options.minDate);
+        this._selectDate(this.options.minDate);
         this._$container.appendChild(this._$picker);
+
+        // обработка брейкпоинтов
+        if (Object.keys(this.options.breakpoints).length) {
+            window.addEventListener('resize', this._onWindowResizeEvent.bind(this));
+            this._onWindowResizeEvent();
+        }
     }
 
     /**
@@ -171,7 +181,7 @@ function DateRangePicker($container, options = {}) {
             this._$months.appendChild($row);
         }
 
-        if (this._selection && (this._selection.date_from || this._selection.date_to)) {
+        if (this._selection.date_from || this._selection.date_to) {
             this._rangeVisualSelect(this._selection.date_from, this._selection.date_to);
         }
     }
@@ -271,6 +281,16 @@ function DateRangePicker($container, options = {}) {
             }
         }
 
+        // переход к новой дате
+        this._selectDate(date);
+    }
+
+    /**
+     * Установка текущей даты с рендером
+     * @param {Date} date Дата
+     */
+    this._selectDate = function(date) {
+        this._selectedDate = date;
         this._$createMonths(date);
     }
 
@@ -463,6 +483,9 @@ function DateRangePicker($container, options = {}) {
         this._rangeVisualSelect.$day_from_old = $day_from;
         this._rangeVisualSelect.$day_to_old = $day_to;
 
+        this._selection.$day_from = $day_from;
+        this._selection.$day_to = $day_to;
+
         if ($day_to) {
             const days = Math.floor(Math.abs(time_from - time_to) / 86400e3) + 1;
             this._tooltipShow($day_to, days);
@@ -475,11 +498,17 @@ function DateRangePicker($container, options = {}) {
      * @param {Number}  days Количество дней
      */
     this._tooltipShow = function($day, days) {
-        const rect = $day.getBoundingClientRect();
-
         this._$tooltip.textContent = this.options.filter.tooltipText.call(this, days) || '';
         this._$tooltip.classList.toggle('is-show', this._$tooltip.textContent.length);
+        this._tooltipUpdate($day);
+    }
 
+    /**
+     * Обновление позиции подсказки
+     * @param {Element} $day Выбранный день
+     */
+    this._tooltipUpdate = function($day) {
+        const rect = $day.getBoundingClientRect();
         this._$tooltip.style.top = Math.round(rect.top + window.scrollY - rect.height - this._$tooltip.offsetHeight) + 'px';
         this._$tooltip.style.left = Math.round(rect.left + window.scrollX + rect.width / 2 - this._$tooltip.offsetWidth / 2) + 'px';
     }
@@ -606,6 +635,46 @@ function DateRangePicker($container, options = {}) {
     }
 
     /**
+     * Событие изменения размеров окна
+     * @param {Event} e DOM событие
+     */
+    this._onWindowResizeEvent = function(e) {
+        if (this._selection.$day_to) {
+            this._tooltipUpdate(this._selection.$day_to);
+        }
+
+        let breakpoint = 0;
+        const breakpoints = Object.keys(this.options.breakpoints).sort((a, b) => a - b);
+        for (let i in breakpoints) {
+            if (window.innerWidth <= breakpoints[i]) {
+                breakpoint = breakpoints[i];
+                break;
+            }
+        }
+
+        this._setBreakpoint(breakpoint);
+    }
+
+    /**
+     * Установка состояния рендера под разные экраны
+     * @param {Number} breakpoint Ключ из this.options.breakpoints (Ширина экрана)
+     */
+    this._setBreakpoint = function(breakpoint) {
+        // от ненужной перерисовки
+        if (this._breakpoint == breakpoint) {
+            return;
+        }
+        this._breakpoint = breakpoint;
+
+        if (!this.options.breakpoints[breakpoint]) {
+            return;
+        }
+
+        Object.assign(this.options, this.options.breakpoints[breakpoint]);
+        this._$createMonths(this._selectedDate);
+    }
+
+    /**
      * Элемент календарного дня
      * @param  {Date} date Дата
      * @return {Element}   HTML элемент
@@ -617,7 +686,6 @@ function DateRangePicker($container, options = {}) {
 
     /**
      * Рендер дня - заглушки
-     * @param  {Date} date Объект даты
      * @return {Element}
      */
     this._$createEmptyDay = function() {
