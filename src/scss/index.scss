@@ -135,6 +135,7 @@
         user-select: none;
         box-sizing: border-box;
         color: var(--daterangepicker-day-color);
+        font-size: 15px;
 
         &:nth-child(6), &:nth-child(7) {
             color: var(--daterangepicker-day-holiday-color);
