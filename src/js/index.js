@@ -458,16 +458,8 @@ DateRangePicker.prototype._$createWeek = function(date) {
  * @return {Element}
  */
 DateRangePicker.prototype._$createDay = function(date) {
-    const locked = this.getDayLocked(date);
-    const today  = this._today.getTime() == date.getTime();
-
-    let className = '';
-    className += locked ? ' is-disabled' : '';
-    className += locked == LOCK_LOCKED ? ' is-locked' : '';
-    className += today ? ' is-today' : '';
-
     const $day = this._$createElement(
-        `<div class="Day${className}" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
+        `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
     );
 
     $day.addEventListener('click', this._onDayClickEvent.bind(this));
@@ -476,7 +468,43 @@ DateRangePicker.prototype._$createDay = function(date) {
         $day.addEventListener('mouseenter', this._onDayMouseEnterEvent.bind(this));
     }
 
+    // обновление состояний
+    this._updateDay($day);
+
     return $day;
+}
+
+/**
+ * Обновление состояний
+ */
+DateRangePicker.prototype.update = function() {
+    this._$months.querySelectorAll('.Month').forEach($month => {
+        this._updateMonth($month);
+    });
+}
+
+/**
+ * Обновление состояний месяца
+ * @param {Element} $month Элемент месяца
+ */
+DateRangePicker.prototype._updateMonth = function($month) {
+    $month.querySelectorAll('.Day[data-time]').forEach($day => {
+        this._updateDay($day);
+    });
+}
+
+/**
+ * Обновление состояний дня
+ * @param {Element} $day Элемент дня
+ */
+DateRangePicker.prototype._updateDay = function($day) {
+    const date   = new Date(parseInt($day.dataset.time, 10));
+    const locked = this.getDayLocked(date);
+    const today  = this._today.getTime() == date.getTime();
+
+    $day.classList.toggle('is-disabled', locked);
+    $day.classList.toggle('is-locked', locked == LOCK_LOCKED);
+    $day.classList.toggle('is-today', today);
 }
 
 /**

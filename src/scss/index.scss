@@ -3,14 +3,17 @@
     --daterangepicker-day-height: 35px;
     --daterangepicker-day-color: #FFFFFF;
     --daterangepicker-day-disabled-color: #505050;
-    --daterangepicker-day-holiday-color: #F13636;
+    --daterangepicker-day-holiday-color: #F44336;
     --daterangepicker-day-disabled-holiday-color: #783c3c;
+    --daterangepicker-day-hover-color: #FFFFFF;
+    --daterangepicker-day-hover-border-color: #0089fd;
     --daterangepicker-day-selected-color: #FFFFFF;
     --daterangepicker-day-selected-background: #0089fd;
     --daterangepicker-day-selected-between-background: rgba(0, 137, 253, 0.3);
 }
 
 .Daterangepicker {
+    position: relative;
     display: block;
 
     &__inputs {
@@ -176,8 +179,8 @@
         }
 
         &:hover {
-            color: var(--daterangepicker-day-selected-color);
-            border: 1px solid var(--daterangepicker-day-selected-background);
+            color: var(--daterangepicker-day-hover-color);
+            border: 1px solid var(--daterangepicker-day-hover-border-color);
         }
 
         &.is-selected {
