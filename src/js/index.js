@@ -480,8 +480,8 @@ function DateRangePicker($container, options = {}) {
         this._$tooltip.textContent = this.options.filter.tooltipText.call(this, days) || '';
         this._$tooltip.classList.toggle('is-show', this._$tooltip.textContent.length);
 
-        this._$tooltip.style.top = Math.round(rect.top - rect.height - this._$tooltip.offsetHeight) + 'px';
-        this._$tooltip.style.left = Math.round(rect.left + rect.width / 2 - this._$tooltip.offsetWidth / 2) + 'px';
+        this._$tooltip.style.top = Math.round(rect.top + window.scrollY - rect.height - this._$tooltip.offsetHeight) + 'px';
+        this._$tooltip.style.left = Math.round(rect.left + window.scrollX + rect.width / 2 - this._$tooltip.offsetWidth / 2) + 'px';
     }
 
     /**
