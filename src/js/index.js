@@ -3,6 +3,12 @@ export const LOCK_UNAVAILABLE = 1;
 export const LOCK_LOCKED      = 2;
 
 function DateRangePicker($container, options = {}) {
+    // от повторной инициализации
+    if ($container.instance) {
+        return $container.instance;
+    }
+    $container.instance = this;
+
     /**
      * Инициализация
      */
