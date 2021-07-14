@@ -13,6 +13,10 @@
 .Daterangepicker {
     display: block;
 
+    &__inputs {
+        display: none;
+    }
+
     &__months {
         display: flex;
         flex-direction: column;
@@ -27,7 +31,7 @@
         background-color: #FFFFFF;
         color: #333333;
         border-radius: 3px;
-        box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         pointer-events: none;
         opacity: 0;
         transition: opacity .1s ease-in-out, transform .1s ease-in-out;

@@ -55,14 +55,20 @@ function DateRangePicker($container, options = {}) {
 
         this._$picker = this._$createElement(
             `<div class="Daterangepicker">
+                <div class="Daterangepicker__inputs">
+                    <input type="hidden" name="date_from">
+                    <input type="hidden" name="date_to">
+                </div>
                 <div class="Daterangepicker__months"></div>
                 <div class="Daterangepicker__tooltip"></div>
             </div>`
         );
 
         // элементы
-        this._$months  = this._$picker.querySelector('.Daterangepicker__months');
-        this._$tooltip = this._$picker.querySelector('.Daterangepicker__tooltip');
+        this._$months    = this._$picker.querySelector('.Daterangepicker__months');
+        this._$tooltip   = this._$picker.querySelector('.Daterangepicker__tooltip');
+        this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
+        this._$inputTo   = this._$picker.querySelector('[name="date_to"]');
 
         // инициализация состояний
         this.rangeReset();
@@ -196,8 +202,24 @@ function DateRangePicker($container, options = {}) {
             [date_from, date_to] = [date_to, date_from];
         }
 
+        // обновление инпутов
+        this._$inputFrom.value = this.formatDate(date_from);
+        this._$inputTo.value   = this.formatDate(date_to);
+
         // событие
         this._callback('rangeSelect', date_from, date_to);
+    }
+
+    /**
+     * Форматирование даты
+     * @param  {Date}   date   Объект даты
+     * @param  {String} format Формат строки
+     * @return {String}
+     */
+    this.formatDate = function(date, format = 'Y-m-d') {
+        return format.replace('Y', date.getFullYear())
+                     .replace('m', ('0' + (date.getMonth() + 1)).slice(-2))
+                     .replace('d', ('0' + (date.getDate())).slice(-2));
     }
 
     /**
