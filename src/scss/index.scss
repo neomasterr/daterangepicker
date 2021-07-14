@@ -105,6 +105,7 @@
 
         &__title {
             text-align: center;
+            font-size: 1rem;
         }
 
         &__week {
@@ -115,6 +116,7 @@
 
         &__weekday {
             padding: 5px;
+            font-size: 0.8rem;
         }
     }
 
@@ -135,7 +137,7 @@
         user-select: none;
         box-sizing: border-box;
         color: var(--daterangepicker-day-color);
-        font-size: 15px;
+        font-size: 0.85rem;
 
         &:nth-child(6), &:nth-child(7) {
             color: var(--daterangepicker-day-holiday-color);
