@@ -25,6 +25,7 @@ function DateRangePicker($container, options = {}) {
             minDate:           options.minDate           || new Date(), // минимальная дата
             maxDate:           options.maxDate           || undefined,
             breakpoints:       options.breakpoints       || {},
+            internalInputs:    options.internalInputs    || true,       // использование встроенных инпутов
             // события
             on: Object.assign({
                 rangeSelect: null, // событие выбора диапазона дат
@@ -55,20 +56,26 @@ function DateRangePicker($container, options = {}) {
 
         this._$picker = this._$createElement(
             `<div class="Daterangepicker">
-                <div class="Daterangepicker__inputs">
-                    <input type="hidden" name="date_from">
-                    <input type="hidden" name="date_to">
-                </div>
+                ${this.options.internalInputs ?
+                    `<div class="Daterangepicker__inputs">
+                        <input type="hidden" name="date_from">
+                        <input type="hidden" name="date_to">
+                    </div>` : ''
+                }
                 <div class="Daterangepicker__months"></div>
                 <div class="Daterangepicker__tooltip"></div>
             </div>`
         );
 
         // элементы
-        this._$months    = this._$picker.querySelector('.Daterangepicker__months');
-        this._$tooltip   = this._$picker.querySelector('.Daterangepicker__tooltip');
-        this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
-        this._$inputTo   = this._$picker.querySelector('[name="date_to"]');
+        this._$months  = this._$picker.querySelector('.Daterangepicker__months');
+        this._$tooltip = this._$picker.querySelector('.Daterangepicker__tooltip');
+
+        // поля ввода
+        if (this.options.internalInputs) {
+            this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
+            this._$inputTo   = this._$picker.querySelector('[name="date_to"]');
+        }
 
         // инициализация состояний
         this.rangeReset();
@@ -203,8 +210,13 @@ function DateRangePicker($container, options = {}) {
         }
 
         // обновление инпутов
-        this._$inputFrom.value = this.formatDate(date_from);
-        this._$inputTo.value   = this.formatDate(date_to);
+        if (this._$inputFrom) {
+            this._$inputFrom.value = this.formatDate(date_from);
+        }
+
+        if (this._$inputTo) {
+            this._$inputTo.value = this.formatDate(date_to);
+        }
 
         // событие
         this._callback('rangeSelect', date_from, date_to);
