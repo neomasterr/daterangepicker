@@ -25,13 +25,15 @@
         padding: 4px;
         font-size: 12px;
         background-color: #FFFFFF;
-        color: black;
+        color: #333333;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
         pointer-events: none;
         opacity: 0;
         transition: opacity .1s ease-in-out, transform .1s ease-in-out;
         transform: translateY(5px);
+        max-width: 100px;
+        text-align: center;
 
         &.is-show {
             opacity: 1;
