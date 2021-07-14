@@ -72,10 +72,8 @@ function DateRangePicker($container, options = {}) {
         this._$tooltip = this._$picker.querySelector('.Daterangepicker__tooltip');
 
         // поля ввода
-        if (this.options.internalInputs) {
-            this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
-            this._$inputTo   = this._$picker.querySelector('[name="date_to"]');
-        }
+        this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
+        this._$inputTo   = this._$picker.querySelector('[name="date_to"]');
 
         // инициализация состояний
         this.rangeReset();
