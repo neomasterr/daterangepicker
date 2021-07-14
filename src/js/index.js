@@ -150,6 +150,110 @@ function DateRangePicker($container, options = {}) {
     }
 
     /**
+     * Сброс выделенных дат
+     */
+    this.rangeReset = function() {
+        this._rangeVisualReset();
+        this._selection = {};
+    }
+
+    /**
+     * Выделение диапазона дат
+     * @param {Date} date_from Начальная дата
+     * @param {Date} date_to   Конечная дата
+     */
+    this.rangeSelect = function(date_from, date_to) {
+        date_from.setHours(0, 0, 0, 0);
+        date_to.setHours(0, 0, 0, 0);
+
+        // допустимый диапазон
+        if (!this.getIsRangeSelectable(date_from, date_to)) {
+            return;
+        }
+
+        const $day_from = this._$getDayByDate(date_from);
+        const $day_to = this._$getDayByDate(date_to);
+
+        if ($day_from) {
+            $day_from.classList.add('is-selected', 'is-selected-from');
+        }
+
+        if ($day_to) {
+            $day_to.classList.add('is-selected', 'is-selected-to');
+        }
+
+        // выделение элементов
+        this._rangeVisualSelect(date_from, date_to);
+
+        // выбор дат в обратном порядке
+        if (date_from > date_to) {
+            [date_from, date_to] = [date_to, date_from];
+        }
+
+        // событие
+        this._callback('rangeSelect', date_from, date_to);
+    }
+
+    /**
+     * Проверка возможности выделения дат
+     * @param  {Date date_from Начальная дата
+     * @param  {Date date_to   Конечная дата
+     * @return {Boolean}
+     */
+    this.getIsRangeSelectable = function(date_from, date_to) {
+        date_from.setHours(0, 0, 0, 0);
+        date_to.setHours(0, 0, 0, 0);
+
+        if (date_from > date_to) {
+            [date_from, date_to] = [date_to, date_from];
+        }
+
+        // минимальный диапазон
+        const diff = Math.abs(date_from.getTime() - date_to.getTime()) / 1000 / 86400;
+        if (diff < this.options.minDays) {
+            return false;
+        }
+
+        // проверка попадания в диапазон заблокированных дат
+        const day = new Date();
+        day.setTime(date_from.getTime());
+
+        while (day < date_to) {
+            if (this.getDayLocked(day)) {
+                return false;
+            }
+
+            day.setDate(day.getDate() + 1);
+        }
+
+        return true;
+    }
+
+    /**
+     * Проверка на доступность дня для брони
+     * @param  {Date} date Дата
+     * @return {Boolean}   true если доступен
+     */
+    this.getDayLocked = function(date) {
+        // выбор дат вне доступного диапазона
+        if (date < this.options.minDate || date > this.options.maxDate) {
+            return LOCK_UNAVAILABLE;
+        }
+
+        return this.options.filter.lockDays.call(this, date);
+    }
+
+    /**
+     * Склонение (1 бобёр, 2 бобра, 5 бобров)
+     * @param  {Number} value Количество
+     * @param  {Array}  forms Массив из 3х элементов, может содержать спецификатор %d для замены
+     * @return {String}
+     */
+    this.plural = function (value, forms) {
+        return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
+    }
+
+    /**
      * Рендер диапазона месяцев
      * @param {Date} date_from Начальная дата
      */
@@ -411,14 +515,6 @@ function DateRangePicker($container, options = {}) {
     }
 
     /**
-     * Сброс выделенных дат
-     */
-    this.rangeReset = function() {
-        this._rangeVisualReset();
-        this._selection = {};
-    }
-
-    /**
      * Визуальный сброс выделенных дат
      */
     this._rangeVisualReset = function() {
@@ -530,108 +626,12 @@ function DateRangePicker($container, options = {}) {
     }
 
     /**
-     * Выделение диапазона дат
-     * @param {Date} date_from Начальная дата
-     * @param {Date} date_to   Конечная дата
-     */
-    this.rangeSelect = function(date_from, date_to) {
-        date_from.setHours(0, 0, 0, 0);
-        date_to.setHours(0, 0, 0, 0);
-
-        // допустимый диапазон
-        if (!this.getIsRangeSelectable(date_from, date_to)) {
-            return;
-        }
-
-        const $day_from = this._$getDayByDate(date_from);
-        const $day_to = this._$getDayByDate(date_to);
-
-        if ($day_from) {
-            $day_from.classList.add('is-selected', 'is-selected-from');
-        }
-
-        if ($day_to) {
-            $day_to.classList.add('is-selected', 'is-selected-to');
-        }
-
-        // выделение элементов
-        this._rangeVisualSelect(date_from, date_to);
-
-        // выбор дат в обратном порядке
-        if (date_from > date_to) {
-            [date_from, date_to] = [date_to, date_from];
-        }
-
-        // событие
-        this._callback('rangeSelect', date_from, date_to);
-    }
-
-    /**
-     * Проверка возможности выделения дат
-     * @param  {Date date_from Начальная дата
-     * @param  {Date date_to   Конечная дата
-     * @return {Boolean}
-     */
-    this.getIsRangeSelectable = function(date_from, date_to) {
-        date_from.setHours(0, 0, 0, 0);
-        date_to.setHours(0, 0, 0, 0);
-
-        if (date_from > date_to) {
-            [date_from, date_to] = [date_to, date_from];
-        }
-
-        // минимальный диапазон
-        const diff = Math.abs(date_from.getTime() - date_to.getTime()) / 1000 / 86400;
-        if (diff < this.options.minDays) {
-            return false;
-        }
-
-        // проверка попадания в диапазон заблокированных дат
-        const day = new Date();
-        day.setTime(date_from.getTime());
-
-        while (day < date_to) {
-            if (this.getDayLocked(day)) {
-                return false;
-            }
-
-            day.setDate(day.getDate() + 1);
-        }
-
-        return true;
-    }
-
-    /**
-     * Проверка на доступность дня для брони
-     * @param  {Date} date Дата
-     * @return {Boolean}   true если доступен
-     */
-    this.getDayLocked = function(date) {
-        // выбор дат вне доступного диапазона
-        if (date < this.options.minDate || date > this.options.maxDate) {
-            return LOCK_UNAVAILABLE;
-        }
-
-        return this.options.filter.lockDays.call(this, date);
-    }
-
-    /**
      * Фильтр недоступных дней по умолчанию
      * @return {Boolean}
      */
     this._filterLockDays = function() {
         // все дни доступны
         return false;
-    }
-
-    /**
-     * Склонение (1 бобёр, 2 бобра, 5 бобров)
-     * @param  {Number} value Количество
-     * @param  {Array}  forms Массив из 3х элементов, может содержать спецификатор %d для замены
-     * @return {String}
-     */
-    this.plural = function (value, forms) {
-        return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
     }
 
     /**
