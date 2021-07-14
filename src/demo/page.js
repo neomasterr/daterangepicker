@@ -42,8 +42,8 @@ new DateRangePicker(document.querySelector('#daterangepicker'), {
         },
     },
     filter: {
-        lockDays: function(day) {
-            if (blockedDates[day]) {
+        lockDays: function(date) {
+            if (blockedDates[date]) {
                 return LOCK_LOCKED;
             }
 
