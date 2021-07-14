@@ -19,7 +19,6 @@
     }
 
     &__tooltip {
-        display: none;
         position: absolute;
         left: 30px;
         top: 30px;
@@ -30,6 +29,14 @@
         border-radius: 3px;
         box-shadow: 0 1px 3px rgb(0 0 0 / 25%);
         pointer-events: none;
+        opacity: 0;
+        transition: opacity .1s ease-in-out, transform .1s ease-in-out;
+        transform: translateY(5px);
+
+        &.is-show {
+            opacity: 1;
+            transform: translateY(0);
+        }
 
         &:before, &:after {
             content: '';
@@ -41,10 +48,6 @@
             height: 5px;
             background-color: #FFFFFF;
             transform: translate(-50%, -2px) rotate(45deg);
-        }
-
-        &.is-show {
-            display: block;
         }
     }
 
@@ -138,6 +141,7 @@
         box-sizing: border-box;
         color: var(--daterangepicker-day-color);
         font-size: 0.85rem;
+        line-height: 1em;
 
         &:nth-child(6), &:nth-child(7) {
             color: var(--daterangepicker-day-holiday-color);
