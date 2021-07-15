@@ -372,6 +372,9 @@ DateRangePicker.prototype._$createMonth = function(date) {
     ].forEach(item => {
         const $arrow = $month.querySelector(item.selector);
         $arrow.addEventListener('click', e => {
+            // временная мера, лучше переверстать, вынести стрелки за пределы перерерисовываемой области пикера
+            e.stopPropagation();
+
             this._onArrowClick($arrow, item.name);
         });
     });
