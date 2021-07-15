@@ -10,6 +10,7 @@
     --daterangepicker-day-selected-color: #FFFFFF;
     --daterangepicker-day-selected-background: #0089fd;
     --daterangepicker-day-selected-between-background: rgba(0, 137, 253, 0.3);
+    --daterangepicker-month-weekday-color: #FFFFFF;
     --daterangepicker-border-radius-small: 3px;
 }
 
@@ -139,6 +140,7 @@
         &__weekday {
             padding: 5px;
             font-size: 0.8rem;
+            color: var(--daterangepicker-month-weekday-color);
         }
     }
 
@@ -193,6 +195,7 @@
         &:hover {
             color: var(--daterangepicker-day-hover-color);
             border-color: var(--daterangepicker-day-hover-border-color);
+            border-radius: var(--daterangepicker-border-radius-small);
         }
 
         &.is-selected {
