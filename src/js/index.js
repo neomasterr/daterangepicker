@@ -66,13 +66,16 @@ DateRangePicker.prototype.init = function() {
                 </div>` : ''
             }
             <div class="Daterangepicker__months"></div>
-            <div class="Daterangepicker__tooltip"></div>
+            <div class="Daterangepicker__tooltip">
+                <div class="Daterangepicker__tooltip-content"></div>
+            </div>
         </div>`
     );
 
     // элементы
-    this._$months  = this._$picker.querySelector('.Daterangepicker__months');
-    this._$tooltip = this._$picker.querySelector('.Daterangepicker__tooltip');
+    this._$months         = this._$picker.querySelector('.Daterangepicker__months');
+    this._$tooltip        = this._$picker.querySelector('.Daterangepicker__tooltip');
+    this._$tooltipContent = this._$picker.querySelector('.Daterangepicker__tooltip-content');
 
     // поля ввода
     this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
@@ -663,7 +666,7 @@ DateRangePicker.prototype._rangeVisualSelect = function(date_from, date_to) {
  * @param {Number}  days Количество дней
  */
 DateRangePicker.prototype._tooltipShow = function($day, days) {
-    this._$tooltip.textContent = this.options.filter.tooltipText.call(this, days) || '';
+    this._$tooltipContent.textContent = this.options.filter.tooltipText.call(this, days) || '';
     this._$tooltip.classList.toggle('is-show', this._$tooltip.textContent.length);
     this._tooltipUpdate($day);
 }
