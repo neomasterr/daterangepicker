@@ -151,6 +151,7 @@
         color: var(--daterangepicker-day-color);
         font-size: 0.85rem;
         line-height: 1em;
+        border: 1px solid transparent;
 
         &:nth-child(6), &:nth-child(7) {
             color: var(--daterangepicker-day-holiday-color);
@@ -162,7 +163,7 @@
 
             &:hover {
                 color: var(--daterangepicker-day-disabled-color);
-                border: none;
+                border-color: transparent;
             }
 
             &:nth-child(6), &:nth-child(7) {
@@ -180,7 +181,7 @@
 
         &:hover {
             color: var(--daterangepicker-day-hover-color);
-            border: 1px solid var(--daterangepicker-day-hover-border-color);
+            border-color: var(--daterangepicker-day-hover-border-color);
         }
 
         &.is-selected {
