@@ -673,9 +673,16 @@ DateRangePicker.prototype._tooltipShow = function($day, days) {
  * @param {Element} $day Выбранный день
  */
 DateRangePicker.prototype._tooltipUpdate = function($day) {
-    const rect = $day.getBoundingClientRect();
-    this._$tooltip.style.top = Math.round(rect.top + window.scrollY - rect.height - this._$tooltip.offsetHeight) + 'px';
-    this._$tooltip.style.left = Math.round(rect.left + window.scrollX + rect.width / 2 - this._$tooltip.offsetWidth / 2) + 'px';
+    let x = 0;
+    let y = 0;
+    let $el = $day;
+    do {
+        y += $el.offsetTop;
+        x += $el.offsetLeft;
+    } while (($el = $el.offsetParent) && $el != this._$picker);
+
+    this._$tooltip.style.top = Math.round(y - this._$tooltip.offsetHeight) + 'px';
+    this._$tooltip.style.left = Math.round(x + $day.offsetWidth / 2 - this._$tooltip.offsetWidth / 2) + 'px';
 }
 
 /**
