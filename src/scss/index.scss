@@ -10,6 +10,7 @@
     --daterangepicker-day-selected-color: #FFFFFF;
     --daterangepicker-day-selected-background: #0089fd;
     --daterangepicker-day-selected-between-background: rgba(0, 137, 253, 0.3);
+    --daterangepicker-border-radius-small: 3px;
 }
 
 .Daterangepicker {
@@ -33,7 +34,7 @@
         font-size: 12px;
         background-color: #FFFFFF;
         color: #333333;
-        border-radius: 3px;
+        border-radius: var(--daterangepicker-border-radius-small);
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         pointer-events: none;
         opacity: 0;
@@ -209,6 +210,18 @@
 
         &.is-today {
             color: var(--daterangepicker-day-holiday-color);
+        }
+
+        &.is-selected-from,
+        &.is-selected-to {
+            border-radius: var(--daterangepicker-border-radius-small) 0 0 var(--daterangepicker-border-radius-small);
+        }
+
+        &.is-selected-between + .is-selected-from,
+        &.is-selected-between + .is-selected-to,
+        &.is-selected-from    + .is-selected-to,
+        &.is-selected-to      + .is-selected-from {
+            border-radius: 0 var(--daterangepicker-border-radius-small) var(--daterangepicker-border-radius-small) 0;
         }
     }
 }
