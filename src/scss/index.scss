@@ -94,7 +94,6 @@
 
     .Month {
         padding: 10px;
-        width: calc(var(--daterangepicker-day-width) * 7 + 20px); // + padding
 
         &__header {
             display: flex;
