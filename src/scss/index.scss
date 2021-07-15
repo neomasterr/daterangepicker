@@ -143,6 +143,7 @@
         flex-direction: row;
         align-items: center;
         justify-content: center;
+        flex-shrink: 0;
         width: var(--daterangepicker-day-width);
         height: var(--daterangepicker-day-height);
         cursor: pointer;
