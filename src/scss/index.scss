@@ -16,7 +16,8 @@
 
 .Daterangepicker {
     position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
 
     &__inputs {
         display: none;
@@ -74,6 +75,7 @@
     &__row {
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
 
         &:first-child {
             .Month {
