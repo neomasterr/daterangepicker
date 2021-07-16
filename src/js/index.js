@@ -90,7 +90,8 @@ DateRangePicker.prototype.init = function() {
     this._$inputs = this._$picker.querySelectorAll('input[name^="date"]');
 
     // инициализация состояний
-    this._selection = {};
+    this._selection       = {};
+    this._visualSelection = {};
 
     // рендер
     this._selectDate(this.options.minDate);
@@ -682,13 +683,13 @@ DateRangePicker.prototype._rangeVisualSelect = function(date_from, date_to) {
     const $day_to = this._$getDayByDate(date_to);
 
     // кеш для быстрого сброса старого выделения
-    if (this._rangeVisualSelect.$day_from_old && this._rangeVisualSelect.$day_from_old != $day_from) {
-        this._rangeVisualSelect.$day_from_old.classList.remove('is-selected', 'is-selected-from');
+    if (this._visualSelection.$day_from_old && this._visualSelection.$day_from_old != $day_from) {
+        this._visualSelection.$day_from_old.classList.remove('is-selected', 'is-selected-from');
     }
 
     // кеш для быстрого сброса старого выделения
-    if (this._rangeVisualSelect.$day_to_old && this._rangeVisualSelect.$day_to_old != $day_to) {
-        this._rangeVisualSelect.$day_to_old.classList.remove('is-selected', 'is-selected-to');
+    if (this._visualSelection.$day_to_old && this._visualSelection.$day_to_old != $day_to) {
+        this._visualSelection.$day_to_old.classList.remove('is-selected', 'is-selected-to');
     }
 
     if ($day_from) {
@@ -700,8 +701,8 @@ DateRangePicker.prototype._rangeVisualSelect = function(date_from, date_to) {
     }
 
     // сохранение в кеш
-    this._rangeVisualSelect.$day_from_old = $day_from;
-    this._rangeVisualSelect.$day_to_old = $day_to;
+    this._visualSelection.$day_from_old = $day_from;
+    this._visualSelection.$day_to_old = $day_to;
 
     this._selection.$day_from = $day_from;
     this._selection.$day_to   = $day_to;
