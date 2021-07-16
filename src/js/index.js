@@ -300,6 +300,16 @@ DateRangePicker.prototype.getDayLocked = function(date) {
  * @return {Date} Дата
  */
 DateRangePicker.prototype.getDateFrom = function() {
+    // начальная дата не указана
+    if (!this._selection.date_from) {
+        return;
+    }
+
+    // начальная дата позже конечной
+    if (this._selection.date_to && this._selection.date_from > this._selection.date_to) {
+        return this._selection.date_to;
+    }
+
     return this._selection.date_from;
 }
 
@@ -314,6 +324,16 @@ DateRangePicker.prototype.getDate = DateRangePicker.prototype.getDateFrom;
  * @return {Date} Дата
  */
 DateRangePicker.prototype.getDateTo = function() {
+    // конечная дата не указана
+    if (!this._selection.date_to) {
+        return;
+    }
+
+    // начальная дата позже конечной
+    if (this._selection.date_from && this._selection.date_from > this._selection.date_to) {
+        return this._selection.date_from;
+    }
+
     return this._selection.date_to;
 }
 
