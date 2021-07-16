@@ -297,7 +297,7 @@ DateRangePicker.prototype.getDayLocked = function(date) {
  * @return {Date} Дата
  */
 DateRangePicker.prototype.getDateFrom = function() {
-    return this._getDateFromInput(INDEX_DATE_FROM);
+    return this._selection.date_from;
 }
 
 /**
@@ -311,7 +311,7 @@ DateRangePicker.prototype.getDate = DateRangePicker.prototype.getDateFrom;
  * @return {Date} Дата
  */
 DateRangePicker.prototype.getDateTo = function() {
-    return this._getDateFromInput(INDEX_DATE_TO);
+    return this._selection.date_to;
 }
 
 /**
@@ -322,15 +322,6 @@ DateRangePicker.prototype.getDateTo = function() {
  */
 DateRangePicker.prototype.plural = function (value, forms) {
     return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
-}
-
-/**
- * Выбранная дата
- * @param  {Number} index Индекс инпута
- * @return {Date}         Дата или undefined
- */
-DateRangePicker.prototype._getDateFromInput = function(index) {
-    return this._$inputs[index] ? new Date(this._$inputs[index].value) : undefined;
 }
 
 /**
@@ -595,8 +586,9 @@ DateRangePicker.prototype._onDayClick = function($day) {
     // выбор одной даты
     if (this.options.singleMode) {
         this.rangeReset();
+        this._selection.date_from = new Date(parseInt($day.dataset.time, 10))
         $day.classList.add('is-selected');
-        this._callback('daySelect', new Date(parseInt($day.dataset.time, 10)));
+        this._callback('daySelect', this._selection.date_from);
         return;
     }
 
