@@ -216,6 +216,10 @@ DateRangePicker.prototype.rangeSelect = function(date_from, date_to) {
     // выделение элементов
     this._rangeVisualSelect(date_from, date_to);
 
+    // сохранение состояния
+    this._selection.date_from = date_from;
+    this._selection.date_to   = date_to;
+
     // выбор дат в обратном порядке
     if (date_from > date_to) {
         [date_from, date_to] = [date_to, date_from];
@@ -692,7 +696,7 @@ DateRangePicker.prototype._rangeVisualSelect = function(date_from, date_to) {
     this._rangeVisualSelect.$day_to_old = $day_to;
 
     this._selection.$day_from = $day_from;
-    this._selection.$day_to = $day_to;
+    this._selection.$day_to   = $day_to;
 
     if ($day_to) {
         const days = Math.floor(Math.abs(time_from - time_to) / 86400e3) + 1;
