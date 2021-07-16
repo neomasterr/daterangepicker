@@ -294,24 +294,24 @@ DateRangePicker.prototype.getDayLocked = function(date) {
 
 /**
  * Выбранная начальная дата
- * @return {String} Дата в формате YYYY-MM-DD
+ * @return {Date} Дата
  */
 DateRangePicker.prototype.getDateFrom = function() {
-    return this._getInputValue(INDEX_DATE_FROM);
+    return this._getDateFromInput(INDEX_DATE_FROM);
 }
 
 /**
  * Выбранная дата (singleMode: true)
- * @return {String} Дата в формате YYYY-MM-DD
+ * @return {Date} Дата
  */
 DateRangePicker.prototype.getDate = DateRangePicker.prototype.getDateFrom;
 
 /**
  * Выбранная конечная дата
- * @return {String} Дата в формате YYYY-MM-DD
+ * @return {Date} Дата
  */
 DateRangePicker.prototype.getDateTo = function() {
-    return this._getInputValue(INDEX_DATE_TO);
+    return this._getDateFromInput(INDEX_DATE_TO);
 }
 
 /**
@@ -326,10 +326,11 @@ DateRangePicker.prototype.plural = function (value, forms) {
 
 /**
  * Выбранная дата
- * @return {Number} index Индекс инпута
+ * @param  {Number} index Индекс инпута
+ * @return {Date}         Дата или undefined
  */
-DateRangePicker.prototype._getInputValue = function(index) {
-    return this._$inputs[index] ? this._$inputs[index].value : '';
+DateRangePicker.prototype._getDateFromInput = function(index) {
+    return this._$inputs[index] ? new Date(this._$inputs[index].value) : undefined;
 }
 
 /**
