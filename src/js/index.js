@@ -14,17 +14,20 @@ function DateRangePicker($container, options = {}) {
 
     this._$container = $container;
 
+    // значение по умолчанию
+    const dv = (x, v) => typeof x == 'undefined' ? v : x;
+
     this.options = {
-        firstDayOfTheWeek: options.firstDayOfTheWeek || 1,          // первый день недели, 0 = вс, 1 = пн, ...
-        singleMode:        options.singleMode        || false,      // выбор одной даты вместо диапазона
-        locale:            options.locale            || 'ru-RU',
-        minDays:           options.minDays           || 1,          // минимальное количество дней в диапазоне
-        monthsCount:       options.monthsCount       || 12,
-        perRow:            options.perRow            || undefined,  // количество месяцев в ряду
-        minDate:           options.minDate           || new Date(), // минимальная дата
-        maxDate:           options.maxDate           || undefined,
-        breakpoints:       options.breakpoints       || {},
-        internalInputs:    options.internalInputs    || true,       // использование встроенных инпутов
+        firstDayOfTheWeek: dv(options.firstDayOfTheWeek, 1), // первый день недели, 0 = вс, 1 = пн, ...
+        singleMode:        dv(options.singleMode, false),    // выбор одной даты вместо диапазона
+        locale:            dv(options.locale, 'ru-RU'),
+        minDays:           dv(options.minDays, 1),           // минимальное количество дней в диапазоне
+        monthsCount:       dv(options.monthsCount, 12),
+        perRow:            dv(options.perRow, undefined),    // количество месяцев в ряду
+        minDate:           dv(options.minDate, new Date()),  // минимальная дата
+        maxDate:           dv(options.maxDate, undefined),
+        breakpoints:       dv(options.breakpoints, {}),
+        internalInputs:    dv(options.internalInputs, true), // использование встроенных инпутов
         // события
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
