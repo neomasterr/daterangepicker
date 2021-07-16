@@ -2,6 +2,9 @@
 export const LOCK_UNAVAILABLE = 1;
 export const LOCK_LOCKED      = 2;
 
+const INDEX_DATE_FROM = 0;
+const INDEX_DATE_TO   = 1;
+
 function DateRangePicker($container, options = {}) {
     // от повторной инициализации
     if ($container.instance) {
@@ -61,8 +64,11 @@ DateRangePicker.prototype.init = function() {
         `<div class="Daterangepicker">
             ${this.options.internalInputs ?
                 `<div class="Daterangepicker__inputs">
-                    <input type="hidden" name="date_from">
-                    <input type="hidden" name="date_to">
+                    ${this.options.singleMode
+                        ? `<input type="hidden" name="date">`
+                        : `<input type="hidden" name="date_from">
+                           <input type="hidden" name="date_to">`
+                    }
                 </div>` : ''
             }
             <div class="Daterangepicker__months"></div>
@@ -78,8 +84,7 @@ DateRangePicker.prototype.init = function() {
     this._$tooltipContent = this._$picker.querySelector('.Daterangepicker__tooltip-content');
 
     // поля ввода
-    this._$inputFrom = this._$picker.querySelector('[name="date_from"]');
-    this._$inputTo   = this._$picker.querySelector('[name="date_to"]');
+    this._$inputs = this._$picker.querySelectorAll('input[name^="date"]');
 
     // инициализация состояний
     this.rangeReset();
@@ -214,12 +219,12 @@ DateRangePicker.prototype.rangeSelect = function(date_from, date_to) {
     }
 
     // обновление инпутов
-    if (this._$inputFrom) {
-        this._$inputFrom.value = this.formatDate(date_from);
+    if (this._$inputs[INDEX_DATE_FROM]) {
+        this._$inputs[INDEX_DATE_FROM].value = this.formatDate(date_from);
     }
 
-    if (this._$inputTo) {
-        this._$inputTo.value = this.formatDate(date_to);
+    if (this._$inputs[INDEX_DATE_TO]) {
+        this._$inputs[INDEX_DATE_TO].value = this.formatDate(date_to);
     }
 
     // событие
@@ -288,6 +293,28 @@ DateRangePicker.prototype.getDayLocked = function(date) {
 }
 
 /**
+ * Выбранная начальная дата
+ * @return {String} Дата в формате YYYY-MM-DD
+ */
+DateRangePicker.prototype.getDateFrom = function() {
+    return this._getInputValue(INDEX_DATE_FROM);
+}
+
+/**
+ * Выбранная дата (singleMode: true)
+ * @return {String} Дата в формате YYYY-MM-DD
+ */
+DateRangePicker.prototype.getDate = DateRangePicker.prototype.getDateFrom;
+
+/**
+ * Выбранная конечная дата
+ * @return {String} Дата в формате YYYY-MM-DD
+ */
+DateRangePicker.prototype.getDateTo = function() {
+    return this._getInputValue(INDEX_DATE_TO);
+}
+
+/**
  * Склонение (1 бобёр, 2 бобра, 5 бобров)
  * @param  {Number} value Количество
  * @param  {Array}  forms Массив из 3х элементов, может содержать спецификатор %d для замены
@@ -295,6 +322,14 @@ DateRangePicker.prototype.getDayLocked = function(date) {
  */
 DateRangePicker.prototype.plural = function (value, forms) {
     return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
+}
+
+/**
+ * Выбранная дата
+ * @return {Number} index Индекс инпута
+ */
+DateRangePicker.prototype._getInputValue = function(index) {
+    return this._$inputs[index] ? this._$inputs[index].value : '';
 }
 
 /**
