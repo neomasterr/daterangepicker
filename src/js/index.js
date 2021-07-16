@@ -194,6 +194,10 @@ DateRangePicker.prototype.rangeReset = function() {
  * @param {Date} date_to   Конечная дата
  */
 DateRangePicker.prototype.rangeSelect = function(date_from, date_to) {
+    if (!(date_from instanceof Date) || !(date_to instanceof Date)) {
+        return;
+    }
+
     date_from.setHours(0, 0, 0, 0);
     date_to.setHours(0, 0, 0, 0);
 
@@ -245,6 +249,10 @@ DateRangePicker.prototype.rangeSelect = function(date_from, date_to) {
  * @return {String}
  */
 DateRangePicker.prototype.formatDate = function(date, format = 'Y-m-d') {
+    if (!(date instanceof Date)) {
+        return;
+    }
+
     return format.replace('Y', date.getFullYear())
                  .replace('m', ('0' + (date.getMonth() + 1)).slice(-2))
                  .replace('d', ('0' + (date.getDate())).slice(-2));
