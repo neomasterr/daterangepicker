@@ -35,8 +35,8 @@ function DateRangePicker($container, options = {}) {
         }, options.on || {}),
         // фильтрующие методы
         filter: Object.assign({
-            lockDays:    this._filterLockDays,    // callback(date) функция блокирования дат, true/LOCK
-            tooltipText: this._filterTooltipText, // callback(days) вывод текста подсказки
+            lockDays:    null, // callback(date) функция блокирования дат, true/LOCK
+            tooltipText: null, // callback(days) вывод текста подсказки
         }, options.filter || {}),
     }
 
@@ -271,7 +271,7 @@ DateRangePicker.prototype.getIsRangeSelectable = function(date_from, date_to) {
     day.setTime(date_from.getTime());
 
     while (day < date_to) {
-        if (this.getDayLocked(day)) {
+        if (this._filterLockDays(day)) {
             return false;
         }
 
@@ -279,20 +279,6 @@ DateRangePicker.prototype.getIsRangeSelectable = function(date_from, date_to) {
     }
 
     return true;
-}
-
-/**
- * Проверка на доступность дня для брони
- * @param  {Date} date Дата
- * @return {Boolean}   true если доступен
- */
-DateRangePicker.prototype.getDayLocked = function(date) {
-    // выбор дат вне доступного диапазона
-    if (date < this.options.minDate || date > this.options.maxDate) {
-        return LOCK_UNAVAILABLE;
-    }
-
-    return this.options.filter.lockDays.call(this, date);
 }
 
 /**
@@ -555,7 +541,7 @@ DateRangePicker.prototype._updateMonth = function($month) {
  */
 DateRangePicker.prototype._updateDay = function($day) {
     const date   = new Date(parseInt($day.dataset.time, 10));
-    const locked = this.getDayLocked(date);
+    const locked = this._filterLockDays(date);
     const today  = this._today.getTime() == date.getTime();
 
     $day.classList.toggle('is-disabled', locked);
@@ -720,7 +706,7 @@ DateRangePicker.prototype._rangeVisualSelect = function(date_from, date_to) {
  * @param {Number}  days Количество дней
  */
 DateRangePicker.prototype._tooltipShow = function($day, days) {
-    this._$tooltipContent.textContent = this.options.filter.tooltipText.call(this, days) || '';
+    this._$tooltipContent.textContent = this._filterTooltipText(days);
     this._$tooltip.classList.toggle('is-show', this._$tooltip.textContent.length);
     this._tooltipUpdate($day);
 }
@@ -755,14 +741,28 @@ DateRangePicker.prototype._tooltipHide = function() {
  * @return {String}
  */
 DateRangePicker.prototype._filterTooltipText = function(days) {
+    if (typeof this.options.filter.tooltipText == 'function') {
+        return this.options.filter.tooltipText.call(this, days) || '';
+    }
+
     return this.plural(days, ['%d день', '%d дня', '%d дней']).replace('%d', days);
 }
 
 /**
- * Фильтр недоступных дней по умолчанию
- * @return {Boolean}
+ * Фильтр недоступных дней
+ * @param {Date} date Дата
  */
-DateRangePicker.prototype._filterLockDays = function() {
+DateRangePicker.prototype._filterLockDays = function(date) {
+    // выбор дат вне доступного диапазона
+    if (date < this.options.minDate || date > this.options.maxDate) {
+        return LOCK_UNAVAILABLE;
+    }
+
+    // пользовательские функции
+    if (typeof this.options.filter.lockDays == 'function') {
+        return this.options.filter.lockDays.call(date);
+    }
+
     // все дни доступны
     return false;
 }
