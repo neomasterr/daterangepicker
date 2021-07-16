@@ -90,7 +90,7 @@ DateRangePicker.prototype.init = function() {
     this._$inputs = this._$picker.querySelectorAll('input[name^="date"]');
 
     // инициализация состояний
-    this.rangeReset();
+    this._selection = {};
 
     // рендер
     this._selectDate(this.options.minDate);
@@ -696,36 +696,38 @@ DateRangePicker.prototype._rangeVisualSelect = function(date_from, date_to) {
 
     if ($day_to) {
         const days = Math.floor(Math.abs(time_from - time_to) / 86400e3) + 1;
-        this._tooltipShow($day_to, days);
+        this._tooltipShow(days);
     }
 }
 
 /**
  * Показ подсказки
- * @param {Element} $day Выбранный день
- * @param {Number}  days Количество дней
+ * @param {Number} days Количество дней
  */
-DateRangePicker.prototype._tooltipShow = function($day, days) {
+DateRangePicker.prototype._tooltipShow = function(days) {
     this._$tooltipContent.textContent = this._filterTooltipText(days);
     this._$tooltip.classList.toggle('is-show', this._$tooltip.textContent.length);
-    this._tooltipUpdate($day);
+    this._tooltipUpdate();
 }
 
 /**
  * Обновление позиции подсказки
- * @param {Element} $day Выбранный день
  */
-DateRangePicker.prototype._tooltipUpdate = function($day) {
+DateRangePicker.prototype._tooltipUpdate = function() {
+    if (!this._selection.$day_to) {
+        return;
+    }
+
     let x = 0;
     let y = 0;
-    let $el = $day;
+    let $el = this._selection.$day_to;
     do {
         y += $el.offsetTop;
         x += $el.offsetLeft;
     } while (($el = $el.offsetParent) && $el != this._$picker);
 
     this._$tooltip.style.top = Math.round(y - this._$tooltip.offsetHeight) + 'px';
-    this._$tooltip.style.left = Math.round(x + $day.offsetWidth / 2 - this._$tooltip.offsetWidth / 2) + 'px';
+    this._$tooltip.style.left = Math.round(x + this._selection.$day_to.offsetWidth / 2 - this._$tooltip.offsetWidth / 2) + 'px';
 }
 
 /**
@@ -773,7 +775,7 @@ DateRangePicker.prototype._filterLockDays = function(date) {
  */
 DateRangePicker.prototype._onWindowResizeEvent = function(e) {
     if (this._selection.$day_to) {
-        this._tooltipUpdate(this._selection.$day_to);
+        this._tooltipUpdate();
     }
 
     let breakpoint = 0;
