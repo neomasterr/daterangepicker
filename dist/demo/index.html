@@ -11,16 +11,27 @@
 </head>
 <body>
     <main>
-        <form class="Form">
-            <div class="Form-row">
-                <div class="Form-item">
-                    <input type="text" name="date_from">
-                    <input type="text" name="date_to">
-                    <div id="daterangepicker"></div>
+        <div class="Container">
+            <form class="Form">
+                <div class="Form-row">
+                    <div class="Form-item">
+                        <input type="text" name="date_from">
+                        <input type="text" name="date_to">
+                        <div id="daterangepicker"></div>
+                    </div>
                 </div>
-            </div>
-        </form>
-        <div class="Todo">
+            </form>
+            <form class="Form">
+                <div class="Form-row">
+                    <div id="daterangepicker-dropdown" class="Form-item">
+                        <input type="text" name="date_from">
+                        <input type="text" name="date_to">
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="Todo Container">
             <label><input type="checkbox" checked><span>Датапикер</span></label>
             <label><input type="checkbox" checked><span>Выбор дат</span></label>
             <label><input type="checkbox" checked><span>Rows</span></label>
