@@ -7,8 +7,8 @@ module.exports = {
     entry: {
         daterangepicker: {
             import: [
-                './src/scss/index.scss',
-                './src/js/index.js',
+                './src/scss/daterangepicker.scss',
+                './src/js/daterangepicker.js',
             ],
             library: {
                 name: 'Daterangepicker',
