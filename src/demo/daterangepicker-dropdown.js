@@ -211,6 +211,7 @@ DateRangePickerDropdown.prototype.close = function() {
  */
 DateRangePickerDropdown.prototype.rangeReset = function() {
     DateRangePicker.prototype.rangeReset.call(this);
+    console.log('rangeReset');
 
     // видимость кнопки "Применить" на мобилке
     this.updateFooterVisibility();

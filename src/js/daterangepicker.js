@@ -185,8 +185,7 @@ DateRangePicker.prototype.getDaysCountInMonth = function(date) {
  * Сброс выделенных дат
  */
 DateRangePicker.prototype.rangeReset = function() {
-    this._rangeVisualReset();
-    this._selection = {};
+    this._rangeReset();
 }
 
 /**
@@ -344,6 +343,14 @@ DateRangePicker.prototype.getDateTo = function() {
  */
 DateRangePicker.prototype.plural = function (value, forms) {
     return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
+}
+
+/**
+ * Сброс выделенных дат
+ */
+DateRangePicker.prototype._rangeReset = function() {
+    this._rangeVisualReset();
+    this._selection = {};
 }
 
 /**
@@ -607,7 +614,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
 
     // выбор одной даты
     if (this.options.singleMode) {
-        this.rangeReset();
+        this._rangeReset();
         this._selection.date_from = new Date(parseInt($day.dataset.time, 10))
         $day.classList.add('is-selected');
         this._callback('daySelect', this._selection.date_from);
@@ -616,7 +623,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
 
     // сброс выбранного ранее диапазона
     if (this._selection.date_from && this._selection.date_to) {
-        this.rangeReset();
+        this._rangeReset();
     }
 
     $day.classList.add('is-selected');
@@ -631,7 +638,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
     if (this._selection.date_from && this._selection.date_to) {
         // допустимый диапазон
         if (!this.getIsRangeSelectable(this._selection.date_from, this._selection.date_to)) {
-            this.rangeReset();
+            this._rangeReset();
             return;
         }
 
