@@ -175,6 +175,7 @@ DateRangePicker.prototype.getWeekDaysFormatted = function() {
  */
 DateRangePicker.prototype.getDaysCountInMonth = function(date) {
     const days = new Date(date.getTime());
+    days.setDate(1);
     days.setHours(0, 0, 0, 0);
     days.setMonth(days.getMonth() + 1);
     days.setDate(0);
@@ -367,6 +368,8 @@ DateRangePicker.prototype._$createMonths = function(date_from) {
 
     // пререндер месяцев
     const currentDate = new Date(date_from.getTime());
+    currentDate.setDate(1);
+    currentDate.setHours(0, 0, 0, 0);
     const $months = [];
     for (let i = 0; i < this.options.monthsCount; ++i) {
         $months.push(this._$createMonth(currentDate));
