@@ -471,6 +471,8 @@ DateRangePicker.prototype._onArrowClick = function($arrow, name) {
     }
 
     const date = new Date(parseInt(this._$months.querySelector('.Month').dataset.time, 10));
+    date.setDate(1);
+    date.setHours(0, 0, 0, 0);
     date.setMonth(date.getMonth() + (name == 'prev' ? -this.options.monthsCount : this.options.monthsCount));
 
     // выход за пределы минимальной даты
