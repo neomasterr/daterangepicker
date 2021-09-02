@@ -28,6 +28,7 @@ function DateRangePicker($container, options = {}) {
         maxDate:           dv(options.maxDate, undefined),
         breakpoints:       dv(options.breakpoints, {}),
         internalInputs:    dv(options.internalInputs, true), // использование встроенных инпутов
+        readOnly:          dv(options.readOnly, false),      // режим "только чтение"
         // события
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
@@ -529,10 +530,12 @@ DateRangePicker.prototype._$createDay = function(date) {
         `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
     );
 
-    $day.addEventListener('click', this._onDayClickEvent.bind(this));
+    if (!this.options.readOnly) {
+        $day.addEventListener('click', this._onDayClickEvent.bind(this));
 
-    if (!this.options.singleMode) {
-        $day.addEventListener('mouseenter', this._onDayMouseEnterEvent.bind(this));
+        if (!this.options.singleMode) {
+            $day.addEventListener('mouseenter', this._onDayMouseEnterEvent.bind(this));
+        }
     }
 
     // обновление состояний
