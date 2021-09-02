@@ -18,17 +18,18 @@ function DateRangePicker($container, options = {}) {
     const dv = (x, v) => typeof x == 'undefined' ? v : x;
 
     this.options = {
-        firstDayOfTheWeek: dv(options.firstDayOfTheWeek, 1), // первый день недели, 0 = вс, 1 = пн, ...
-        singleMode:        dv(options.singleMode, false),    // выбор одной даты вместо диапазона
+        firstDayOfTheWeek: dv(options.firstDayOfTheWeek, 1),    // первый день недели, 0 = вс, 1 = пн, ...
+        singleMode:        dv(options.singleMode, false),       // выбор одной даты вместо диапазона
         locale:            dv(options.locale, 'ru-RU'),
-        minDays:           dv(options.minDays, 1),           // минимальное количество дней в диапазоне
+        minDays:           dv(options.minDays, 1),              // минимальное количество дней в диапазоне
         monthsCount:       dv(options.monthsCount, 12),
-        perRow:            dv(options.perRow, undefined),    // количество месяцев в ряду
-        minDate:           dv(options.minDate, new Date()),  // минимальная дата
+        perRow:            dv(options.perRow, undefined),       // количество месяцев в ряду
+        currentDate:       dv(options.currentDate, new Date()), // текущая дата
+        minDate:           dv(options.minDate, undefined),      // минимальная дата
         maxDate:           dv(options.maxDate, undefined),
         breakpoints:       dv(options.breakpoints, {}),
-        internalInputs:    dv(options.internalInputs, true), // использование встроенных инпутов
-        readOnly:          dv(options.readOnly, false),      // режим "только чтение"
+        internalInputs:    dv(options.internalInputs, true),    // использование встроенных инпутов
+        readOnly:          dv(options.readOnly, false),         // режим "только чтение"
         // события
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
@@ -53,9 +54,16 @@ DateRangePicker.prototype.init = function() {
         this.options.perRow = this.options.monthsCount;
     }
 
-    if (this.options.minDate) {
-        this.options.minDate.setHours(0, 0, 0, 0);
+    // фикс текущей даты
+    if (!this.options.currentDate || !(this.options.currentDate instanceof Date)) {
+        this.options.currentDate = new Date();
     }
+
+    ['minDate', 'currentDate', 'maxDate'].forEach(item => {
+        if (this.options[item] && this.options[item] instanceof Date) {
+            this.options[item].setHours(0, 0, 0, 0);
+        }
+    })
 
     // опции для экранов по умолчанию
     this.options.breakpoints[this._breakpoint = 0] = Object.assign({}, this.options);
@@ -95,7 +103,7 @@ DateRangePicker.prototype.init = function() {
     this._visualSelection = {};
 
     // рендер
-    this._selectDate(this.options.minDate);
+    this._selectDate(this.options.currentDate);
     this._$container.appendChild(this._$picker);
 
     // обработка брейкпоинтов
