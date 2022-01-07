@@ -18,18 +18,19 @@ function DateRangePicker($container, options = {}) {
     const dv = (x, v) => typeof x == 'undefined' ? v : x;
 
     this.options = {
-        firstDayOfTheWeek: dv(options.firstDayOfTheWeek, 1),    // первый день недели, 0 = вс, 1 = пн, ...
-        singleMode:        dv(options.singleMode, false),       // выбор одной даты вместо диапазона
+        firstDayOfTheWeek: dv(options.firstDayOfTheWeek, 1) % 7, // первый день недели, 0 = вс, 1 = пн, ...
+        singleMode:        dv(options.singleMode, false),        // выбор одной даты вместо диапазона
         locale:            dv(options.locale, 'ru-RU'),
-        minDays:           dv(options.minDays, 1),              // минимальное количество дней в диапазоне
+        minDays:           dv(options.minDays, 1),               // минимальное количество дней в диапазоне
         monthsCount:       dv(options.monthsCount, 12),
-        perRow:            dv(options.perRow, undefined),       // количество месяцев в ряду
-        currentDate:       dv(options.currentDate, new Date()), // текущая дата
-        minDate:           dv(options.minDate, undefined),      // минимальная дата
+        perRow:            dv(options.perRow, undefined),        // количество месяцев в ряду
+        currentDate:       dv(options.currentDate, new Date()),  // текущая дата
+        selectedDate:      dv(options.selectedDate, new Date()), // выбранный месяц
+        minDate:           dv(options.minDate, undefined),       // минимальная дата
         maxDate:           dv(options.maxDate, undefined),
         breakpoints:       dv(options.breakpoints, {}),
-        internalInputs:    dv(options.internalInputs, true),    // использование встроенных инпутов
-        readOnly:          dv(options.readOnly, false),         // режим "только чтение"
+        internalInputs:    dv(options.internalInputs, true),     // использование встроенных инпутов
+        readOnly:          dv(options.readOnly, false),          // режим "только чтение"
         // события
         on: Object.assign({
             rangeSelect: null, // событие выбора диапазона дат
@@ -59,18 +60,19 @@ DateRangePicker.prototype.init = function() {
         this.options.currentDate = new Date();
     }
 
-    ['minDate', 'currentDate', 'maxDate'].forEach(item => {
+    // фикс текущей даты
+    if (!this.options.selectedDate || !(this.options.selectedDate instanceof Date)) {
+        this.options.selectedDate = new Date(this.options.currentDate.getTime());
+    }
+
+    ['minDate', 'currentDate', 'selectedDate', 'maxDate'].forEach(item => {
         if (this.options[item] && this.options[item] instanceof Date) {
             this.options[item].setHours(0, 0, 0, 0);
         }
-    })
+    });
 
     // опции для экранов по умолчанию
     this.options.breakpoints[this._breakpoint = 0] = Object.assign({}, this.options);
-
-    // текущий день
-    this._today = new Date();
-    this._today.setHours(0, 0, 0, 0);
 
     this._$picker = this._$createElement(
         `<div class="Daterangepicker">
@@ -103,7 +105,7 @@ DateRangePicker.prototype.init = function() {
     this._visualSelection = {};
 
     // рендер
-    this._selectDate(this.options.currentDate);
+    this.selectDate(this.options.selectedDate);
     this._$container.appendChild(this._$picker);
 
     // обработка брейкпоинтов
@@ -137,42 +139,20 @@ DateRangePicker.prototype.getDateTimeFormat = function(date, options) {
  * Дни недели
  */
 DateRangePicker.prototype.getWeekDaysFormatted = function() {
-    const date = new Date();
+    const tmp = new Date();
     const result = [];
 
-    date.setDate(date.getDate() - 2);
+    tmp.setDate(tmp.getDate() - tmp.getDay());                   // понедельник
+    tmp.setDate(tmp.getDate() + this.options.firstDayOfTheWeek); // установленный первый день недели
+
     for (let i = 0; i < 7; ++i) {
-        date.setDate(date.getDate() + 1);
         result.push({
-            day: date.getDay(),
-            title: this.getDateTimeFormat(date, {weekday: 'short'}),
+            day: tmp.getDay(),
+            title: this.getDateTimeFormat(tmp, {weekday: 'short'}),
         });
+
+        tmp.setDate(tmp.getDate() + 1);
     }
-
-    // сортировка согласно настроенному первому дню недели
-    result.sort((a, b) => {
-        const firstDayOfTheWeek = this.options.firstDayOfTheWeek % 7;
-        let dayA = a.day;
-        let dayB = b.day;
-
-        if (dayA == firstDayOfTheWeek) {
-            return -1;
-        }
-
-        if (dayB == firstDayOfTheWeek) {
-            return 1;
-        }
-
-        if (dayA < firstDayOfTheWeek) {
-            dayA += result.length;
-        }
-
-        if (dayB < firstDayOfTheWeek) {
-            dayB += result.length;
-        }
-
-        return dayA - dayB;
-    });
 
     return result;
 }
@@ -195,7 +175,11 @@ DateRangePicker.prototype.getDaysCountInMonth = function(date) {
  * Сброс выделенных дат
  */
 DateRangePicker.prototype.rangeReset = function() {
-    this._rangeReset();
+    this._rangeVisualReset();
+    this._selection = {};
+
+    // событие
+    this._callback('rangeReset');
 }
 
 /**
@@ -289,8 +273,7 @@ DateRangePicker.prototype.getIsRangeSelectable = function(date_from, date_to) {
     }
 
     // проверка попадания в диапазон заблокированных дат
-    const day = new Date();
-    day.setTime(date_from.getTime());
+    const day = new Date(date_from.getTime());
 
     while (day < date_to) {
         if (this._filterLockDays(day)) {
@@ -353,14 +336,6 @@ DateRangePicker.prototype.getDateTo = function() {
  */
 DateRangePicker.prototype.plural = function (value, forms) {
     return (value % 10 == 1 && value % 100 != 11 ? forms[0] : (value % 10 >= 2 && value % 10 <= 4 && (value % 100 < 10 || value % 100 >= 20) ? forms[1] : forms[2])).replace('%d', value);
-}
-
-/**
- * Сброс выделенных дат
- */
-DateRangePicker.prototype._rangeReset = function() {
-    this._rangeVisualReset();
-    this._selection = {};
 }
 
 /**
@@ -503,16 +478,17 @@ DateRangePicker.prototype._onArrowClick = function($arrow, name) {
     }
 
     // переход к новой дате
-    this._selectDate(date);
+    this.selectDate(date);
 }
 
 /**
  * Установка текущей даты с рендером
  * @param {Date} date Дата
  */
-DateRangePicker.prototype._selectDate = function(date) {
-    this._selectedDate = date;
+DateRangePicker.prototype.selectDate = function(date) {
+    this.options.selectedDate = date;
     this._$createMonths(date);
+    this._callback('selectDate', date);
 }
 
 /**
@@ -578,7 +554,7 @@ DateRangePicker.prototype._updateMonth = function($month) {
 DateRangePicker.prototype._updateDay = function($day) {
     const date   = new Date(parseInt($day.dataset.time, 10));
     const locked = this._filterLockDays(date);
-    const today  = this._today.getTime() == date.getTime();
+    const today  = this.options.currentDate.getTime() == date.getTime();
 
     $day.classList.toggle('is-disabled', locked);
     $day.classList.toggle('is-locked', locked == LOCK_LOCKED);
@@ -630,7 +606,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
 
     // выбор одной даты
     if (this.options.singleMode) {
-        this._rangeReset();
+        this.rangeReset();
         this._selection.date_from = new Date(parseInt($day.dataset.time, 10))
         $day.classList.add('is-selected');
         this._callback('daySelect', this._selection.date_from);
@@ -639,7 +615,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
 
     // сброс выбранного ранее диапазона
     if (this._selection.date_from && this._selection.date_to) {
-        this._rangeReset();
+        this.rangeReset();
     }
 
     $day.classList.add('is-selected');
@@ -654,7 +630,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
     if (this._selection.date_from && this._selection.date_to) {
         // допустимый диапазон
         if (!this.getIsRangeSelectable(this._selection.date_from, this._selection.date_to)) {
-            this._rangeReset();
+            this.rangeReset();
             return;
         }
 
@@ -842,7 +818,7 @@ DateRangePicker.prototype._setBreakpoint = function(breakpoint) {
     }
 
     Object.assign(this.options, this.options.breakpoints[breakpoint]);
-    this._$createMonths(this._selectedDate);
+    this._$createMonths(this.options.selectedDate);
 }
 
 /**

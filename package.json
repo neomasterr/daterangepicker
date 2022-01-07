@@ -1,8 +1,8 @@
 {
   "name": "daterangepicker",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "",
-  "main": "./src/index.js",
+  "main": "./src/js/daterangepicker.js",
   "scripts": {
     "start": "webpack --mode=development --config=webpack.dev.js --watch",
     "dev": "webpack --mode=development --config=webpack.dev.js",
@@ -10,8 +10,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "neomasterr",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
+    "@neomasterr/event-emitter": "^1.0.4",
     "css-loader": "^5.2.6",
     "html-webpack-plugin": "^5.3.2",
     "mini-css-extract-plugin": "^1.6.2",
@@ -21,6 +22,5 @@
     "webpack": "^5.44.0",
     "webpack-cli": "^4.7.2",
     "webpack-livereload-plugin": "^3.0.1"
-  },
-  "dependencies": {}
+  }
 }
