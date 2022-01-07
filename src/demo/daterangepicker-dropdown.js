@@ -1,15 +1,12 @@
-import DateRangePicker, {LOCK_UNAVAILABLE, LOCK_LOCKED} from './daterangepicker-wrapper';
-
-export {
-    LOCK_LOCKED,
-    LOCK_UNAVAILABLE,
-}
+import EventEmitter from '@neomasterr/event-emitter';
+import DateRangePicker, {createElement} from './daterangepicker-wrapper';
 
 function DateRangePickerDropdown($element, options = {}) {
-    // ссылка на экземпляр
-    if ($element.instance) {
-        return $element.instance;
-    }
+    // наследование
+    EventEmitter.call(this, options.on);
+
+    // элементы
+    this._$element = $element;
 
     // определение мобилки
     Object.defineProperty(this, '_isMobile', {
@@ -21,7 +18,7 @@ function DateRangePickerDropdown($element, options = {}) {
         get: () => !this._isMobile,
     });
 
-    this._$dropdown = this._$createElement(
+    this._$dropdown = createElement(
         `<div class="Daterangepicker-dropdown">
             <div class="Daterangepicker-dropdown__header">
                 <div class="Daterangepicker-dropdown__header-close">
@@ -42,9 +39,6 @@ function DateRangePickerDropdown($element, options = {}) {
         </div>`
     );
     this._$dropdownWrapper = this._$dropdown.querySelector('.Daterangepicker-dropdown__wrapper');
-
-    // элементы
-    this._$element = $element;
 
     /////////////
     // мобилка //
@@ -69,7 +63,7 @@ function DateRangePickerDropdown($element, options = {}) {
     }
 
     // наследуемся
-    DateRangePicker.call(this, this._$dropdownWrapper, Object.assign({}, options, {
+    this.datepicker = new DateRangePicker(this._$dropdownWrapper, Object.assign({}, options.datepicker, {
         monthsCount: 2,
         singleMode: false,
         breakpoints: {
@@ -79,29 +73,37 @@ function DateRangePickerDropdown($element, options = {}) {
         },
     }));
 
+    this.datepicker.on('range-select', (date_from, date_to) => {
+        // видимость кнопки "Применить" на мобилке
+        this.updateFooterVisibility();
+
+        // на мобилке событие rangeSelect вызывается только по кнопке "Применить"
+        if (!this._autoApply && !this._enableRangeSelectCallback) {
+            return;
+        }
+
+        this.apply();
+    });
+
+    this.datepicker.on('range-reset', () => {
+        // видимость кнопки "Применить" на мобилке
+        this.updateFooterVisibility();
+    });
+
     // обёртка элементов
     this._$element.appendChild(this._$dropdown);
     this._$element.addEventListener('click', this._onClickEvent.bind(this));
-}
-
-// цепочка прототипов
-DateRangePickerDropdown.prototype = Object.create(DateRangePicker.prototype, {
-    constructor: {
-        value: DateRangePickerDropdown,
-        enumerable: false,
-        writable: true,
-    }
-});
-
-/**
- * Инициализация компонента
- */
-DateRangePickerDropdown.prototype.init = function() {
-    DateRangePicker.prototype.init.call(this);
 
     // плавные анимации
     this._$dropdown.classList.add('is-initialized');
 }
+
+Object.assign(DateRangePickerDropdown.prototype, EventEmitter.prototype);
+Object.defineProperty(DateRangePickerDropdown.prototype, 'constructor', {
+    value: DateRangePickerDropdown,
+    writable: true,
+    enumerable: false,
+});
 
 /**
  * Событие клика на контейнер
@@ -154,7 +156,7 @@ DateRangePickerDropdown.prototype.open = function() {
     }
 
     // обновление позиции подсказки
-    this._tooltipUpdate();
+    this.datepicker._tooltipUpdate();
 
     // позволяем событию завершиться
     if (!this._onDocumentClickEventBind) {
@@ -197,9 +199,9 @@ DateRangePickerDropdown.prototype.close = function() {
             // выбираем последние подтверждённые даты
             if (this._lastAppliedDateFrom && this._lastAppliedDateTo) {
                 setTimeout(() => {
-                    this._selection.date_from = this._lastAppliedDateFrom;
-                    this._selection.date_to = this._lastAppliedDateTo;
-                    this._rangeVisualSelect(this._lastAppliedDateFrom, this._lastAppliedDateTo);
+                    this.datepicker._selection.date_from = this._lastAppliedDateFrom;
+                    this.datepicker._selection.date_to = this._lastAppliedDateTo;
+                    this.datepicker._rangeVisualSelect(this._lastAppliedDateFrom, this._lastAppliedDateTo);
                 }, 200);
             }
         }
@@ -207,51 +209,11 @@ DateRangePickerDropdown.prototype.close = function() {
 }
 
 /**
- * Событие сброса выделения
- */
-DateRangePickerDropdown.prototype.rangeReset = function() {
-    DateRangePicker.prototype.rangeReset.call(this);
-    console.log('rangeReset');
-
-    // видимость кнопки "Применить" на мобилке
-    this.updateFooterVisibility();
-}
-
-/**
- * Выбор диапазона дат
- * @param {Date} date_from Начальная дата
- * @param {Date} date_to   Конечная дата
- */
-DateRangePickerDropdown.prototype.rangeSelect = function(date_from, date_to) {
-    DateRangePicker.prototype.rangeSelect.call(this, date_from, date_to);
-
-    // видимость кнопки "Применить" на мобилке
-    this.updateFooterVisibility();
-
-    if (this._autoApply) {
-        this.apply();
-    }
-}
-
-/**
- * Safe вызов внешних событий компонента
- * @param {String} f Имя события
- */
-DateRangePickerDropdown.prototype._callback = function(f) {
-    // на мобилке событие rangeSelect вызывается только по кнопке "Применить"
-    if (!this._autoApply && f == 'rangeSelect' && !this._enableRangeSelectCallback) {
-        return;
-    }
-
-    DateRangePicker.prototype._callback.apply(this, arguments);
-}
-
-/**
  * Подтверждение выбора дат
  */
 DateRangePickerDropdown.prototype.apply = function() {
-    const date_from = this.getDateFrom();
-    const date_to   = this.getDateTo();
+    const date_from = this.datepicker.getDateFrom();
+    const date_to   = this.datepicker.getDateTo();
 
     this._lastAppliedDateFrom = date_from;
     this._lastAppliedDateTo   = date_to;
@@ -260,17 +222,12 @@ DateRangePickerDropdown.prototype.apply = function() {
         return;
     }
 
-    // на мобилке событие rangeSelect глушится т.к. требуется подтверждение по кнопке "Применить"
-    if (!this._autoApply) {
-        this._enableRangeSelectCallback = true;
-        DateRangePicker.prototype.rangeSelect.call(this, date_from, date_to);
-    }
-
     this._$element.dispatchEvent(new Event('change', {
         bubbles: true,
         cancelable: true,
     }));
 
+    this.emit('apply', date_from, date_to);
     this.close();
 }
 
@@ -298,7 +255,7 @@ DateRangePickerDropdown.prototype.updateFooterVisibility = function() {
         this._dropdownContainerPrevScroll = this._$dropdownWrapper.scrollTop;
     }
 
-    const bothDatesSelected = !!this.getDateFrom() && !!this.getDateTo();
+    const bothDatesSelected = !!this.datepicker.getDateFrom() && !!this.datepicker.getDateTo();
     const scrolledDown = this._dropdownContainerPrevScroll >= this._$dropdownWrapper.scrollTop;
     const isActive = [
         bothDatesSelected,
@@ -315,6 +272,10 @@ DateRangePickerDropdown.prototype.updateFooterVisibility = function() {
  */
 DateRangePickerDropdown.prototype._onPopStateEvent = function(e) {
     this.close();
+}
+
+DateRangePickerDropdown.prototype.setBookingDates = function() {
+    this.datepicker.setBookingDates.apply(this.datepicker, arguments);
 }
 
 export default DateRangePickerDropdown;

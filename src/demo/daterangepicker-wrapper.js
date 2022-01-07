@@ -1,8 +1,9 @@
-import DateRangePicker, {LOCK_UNAVAILABLE, LOCK_LOCKED} from '../../dist/daterangepicker';
+import DateRangePicker, {LOCK_UNAVAILABLE, LOCK_LOCKED, createElement} from '../../dist/daterangepicker';
 
 export {
     LOCK_LOCKED,
     LOCK_UNAVAILABLE,
+    createElement,
 }
 
 /**
@@ -108,7 +109,7 @@ DateRangePickerWrapper.prototype._rangeVisualSelect = function(date_from, date_t
                 return
             }
 
-            $wrapper = this._$createElement('<div class="Days__selected"></div>');
+            $wrapper = createElement('<div class="Days__selected"></div>');
             $week.insertBefore($wrapper, $selected[0]);
 
             $selected.forEach($day => {

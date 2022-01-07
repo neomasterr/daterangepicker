@@ -1,16 +1,59 @@
+import EventEmitter from '@neomasterr/event-emitter';
+
 // состояния заблокированных дат
 export const LOCK_UNAVAILABLE = 1;
 export const LOCK_LOCKED      = 2;
 
+/**
+ * Создание элемента из HTML текста
+ * @param  {String} html HTML текст
+ * @return {Element}
+ */
+export const createElement = (html) => {
+    const template = document.createElement('template');
+    template.insertAdjacentHTML('afterbegin', html);
+    return template.children.length > 1 ? [...template.children] : template.firstElementChild;
+}
+
+/**
+ * Форматирование даты
+ * @param  {Date}   date   Объект даты
+ * @param  {String} format Формат строки
+ * @return {String}
+ */
+export const formatDate = function(date, format = 'Y-m-d') {
+    if (!(date instanceof Date)) {
+        return;
+    }
+
+    return format.replace('Y', date.getFullYear())
+                 .replace('m', ('0' + (date.getMonth() + 1)).slice(-2))
+                 .replace('d', ('0' + (date.getDate())).slice(-2));
+}
+
 const INDEX_DATE_FROM = 0;
 const INDEX_DATE_TO   = 1;
 
+/**
+ * Датапикер
+ * @param {Element} $container HTML элемент
+ * @param {Object} options     Опции
+ *
+ * События:
+ * range-reset                          сброс дат
+ * range-select(<from date>, <to date>) выбор диапазона дат
+ * select-date(<date>)                  смена месяца
+ * day-select(<date)                    выбор одной даты (только при singleMode: true)
+ */
 function DateRangePicker($container, options = {}) {
     // от повторной инициализации
     if ($container.instance) {
         return $container.instance;
     }
     $container.instance = this;
+
+    // наследование
+    EventEmitter.call(this, options.on);
 
     this._$container = $container;
 
@@ -31,11 +74,6 @@ function DateRangePicker($container, options = {}) {
         breakpoints:       dv(options.breakpoints, {}),
         internalInputs:    dv(options.internalInputs, true),     // использование встроенных инпутов
         readOnly:          dv(options.readOnly, false),          // режим "только чтение"
-        // события
-        on: Object.assign({
-            rangeSelect: null, // событие выбора диапазона дат
-            daySelect:   null, // событие выбора одной даты (только при singleMode: true)
-        }, options.on || {}),
         // фильтрующие методы
         filter: Object.assign({
             lockDays:    null, // callback(date) функция блокирования дат, true/LOCK
@@ -45,6 +83,13 @@ function DateRangePicker($container, options = {}) {
 
     this.init();
 }
+
+Object.assign(DateRangePicker.prototype, EventEmitter.prototype);
+Object.defineProperty(DateRangePicker.prototype, 'constructor', {
+    value: DateRangePicker,
+    writable: true,
+    enumerable: false,
+});
 
 /**
  * Инициализация
@@ -74,7 +119,7 @@ DateRangePicker.prototype.init = function() {
     // опции для экранов по умолчанию
     this.options.breakpoints[this._breakpoint = 0] = Object.assign({}, this.options);
 
-    this._$picker = this._$createElement(
+    this._$picker = createElement(
         `<div class="Daterangepicker">
             ${this.options.internalInputs ?
                 `<div class="Daterangepicker__inputs">
@@ -179,7 +224,7 @@ DateRangePicker.prototype.rangeReset = function() {
     this._selection = {};
 
     // событие
-    this._callback('rangeReset');
+    this.emit('range-reset');
 }
 
 /**
@@ -225,31 +270,15 @@ DateRangePicker.prototype.rangeSelect = function(date_from, date_to) {
 
     // обновление инпутов
     if (this._$inputs[INDEX_DATE_FROM]) {
-        this._$inputs[INDEX_DATE_FROM].value = this.formatDate(date_from);
+        this._$inputs[INDEX_DATE_FROM].value = formatDate(date_from);
     }
 
     if (this._$inputs[INDEX_DATE_TO]) {
-        this._$inputs[INDEX_DATE_TO].value = this.formatDate(date_to);
+        this._$inputs[INDEX_DATE_TO].value = formatDate(date_to);
     }
 
     // событие
-    this._callback('rangeSelect', date_from, date_to);
-}
-
-/**
- * Форматирование даты
- * @param  {Date}   date   Объект даты
- * @param  {String} format Формат строки
- * @return {String}
- */
-DateRangePicker.prototype.formatDate = function(date, format = 'Y-m-d') {
-    if (!(date instanceof Date)) {
-        return;
-    }
-
-    return format.replace('Y', date.getFullYear())
-                 .replace('m', ('0' + (date.getMonth() + 1)).slice(-2))
-                 .replace('d', ('0' + (date.getDate())).slice(-2));
+    this.emit('range-select', date_from, date_to);
 }
 
 /**
@@ -386,7 +415,7 @@ DateRangePicker.prototype._$createMonth = function(date) {
     const monthTitle = this.getMonthFormatted(date);
     const weekDays = this.getWeekDaysFormatted();
 
-    const $month = this._$createElement(
+    const $month = createElement(
         `<div class="Month" data-time="${date.getTime()}">
             <div class="Month__header">
                 <div class="Month__arrow Month__arrow--prev${(this.options.minDate && date <= this.options.minDate) ? ' is-disabled' : ''}">
@@ -488,7 +517,7 @@ DateRangePicker.prototype._onArrowClick = function($arrow, name) {
 DateRangePicker.prototype.selectDate = function(date) {
     this.options.selectedDate = date;
     this._$createMonths(date);
-    this._callback('selectDate', date);
+    this.emit('select-date', date);
 }
 
 /**
@@ -497,7 +526,7 @@ DateRangePicker.prototype.selectDate = function(date) {
  * @return {Element}
  */
 DateRangePicker.prototype._$createWeek = function(date) {
-    const $week = this._$createElement(
+    const $week = createElement(
         `<div class="Week"></div>`
     );
 
@@ -510,7 +539,7 @@ DateRangePicker.prototype._$createWeek = function(date) {
  * @return {Element}
  */
 DateRangePicker.prototype._$createDay = function(date) {
-    const $day = this._$createElement(
+    const $day = createElement(
         `<div class="Day" data-time="${date.getTime()}" data-day="${date.getDay()}">${date.getDate()}</div>`
     );
 
@@ -609,7 +638,7 @@ DateRangePicker.prototype._onDayClick = function($day) {
         this.rangeReset();
         this._selection.date_from = new Date(parseInt($day.dataset.time, 10))
         $day.classList.add('is-selected');
-        this._callback('daySelect', this._selection.date_from);
+        this.emit('day-select', this._selection.date_from);
         return;
     }
 
@@ -836,34 +865,11 @@ DateRangePicker.prototype._$getDayByDate = function(date) {
  * @return {Element}
  */
 DateRangePicker.prototype._$createEmptyDay = function() {
-    const $day = this._$createElement(
+    const $day = createElement(
         `<div class="Day is-empty"></div>`
     );
 
     return $day;
-}
-
-/**
- * Создание элемента из HTML текста
- * @param  {String} html HTML текст
- * @return {Element}
- */
-DateRangePicker.prototype._$createElement = function(html) {
-    const div = document.createElement('div');
-    div.insertAdjacentHTML('afterbegin', html);
-    return div.children.length > 1 ? div.children : div.firstElementChild;
-}
-
-/**
- * Safe вызов внешних событий компонента
- * @param {String} f Имя события
- */
-DateRangePicker.prototype._callback = function(f) {
-    if (typeof this.options.on[f] == 'function') {
-        return this.options.on[f].apply(this, [].slice.call(arguments, 1));
-    }
-
-    return;
 }
 
 export default DateRangePicker;

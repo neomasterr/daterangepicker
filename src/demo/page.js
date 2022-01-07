@@ -1,4 +1,4 @@
-import DateRangePicker, {LOCK_UNAVAILABLE, LOCK_LOCKED} from '../../dist/daterangepicker';
+import DateRangePicker, {LOCK_UNAVAILABLE, LOCK_LOCKED, formatDate} from '../../dist/daterangepicker';
 import DateRangePickerDropdown from './daterangepicker-dropdown';
 
 const $form         = document.forms[0];
@@ -42,16 +42,16 @@ function generateRandomBookingDates() {
 }
 
 const blockedDates = generateRandomBlockedDates();
+const minDate = new Date();
+minDate.setDate(1);
+minDate.setMonth(minDate.getMonth() - 12);
+
+const maxDate = new Date();
+maxDate.setDate(1);
+maxDate.setMonth(maxDate.getMonth() + 12);
+maxDate.setDate(0);
 
 (function() {
-    const minDate = new Date();
-    minDate.setDate(1);
-    minDate.setMonth(minDate.getMonth() - 12);
-
-    const maxDate = new Date();
-    maxDate.setDate(1);
-    maxDate.setMonth(maxDate.getMonth() + 12);
-    maxDate.setDate(0);
 
     const datepicker = new DateRangePicker(document.querySelector('#daterangepicker'), {
         minDate: minDate,
@@ -72,11 +72,11 @@ const blockedDates = generateRandomBlockedDates();
             },
         },
         on: {
-            rangeSelect: function(date_from, date_to) {
+            'range-select': function(date_from, date_to) {
                 $form.elements['date_from'].value = date_from.toLocaleDateString();
                 $form.elements['date_to'].value   = date_to.toLocaleDateString();
             },
-            daySelect: function(date_from) {
+            'day-select': function(date_from) {
                 $form.elements['date_from'].value = date_from.toLocaleDateString();
             },
         },
@@ -94,39 +94,38 @@ const blockedDates = generateRandomBlockedDates();
 
 (function() {
     const dropdown = new DateRangePickerDropdown(document.querySelector('#daterangepicker-dropdown'), {
-        minDate: new Date(),
-        maxDate: new Date('2022-05-20'),
-        monthsCount: 2,
-        perRow: 3,
-        singleMode: false,
-        internalInputs: false,
-        breakpoints: {
-            960: {
-                monthsCount: 12,
+        datepicker: {
+            minDate: minDate,
+            maxDate: maxDate,
+            monthsCount: 2,
+            perRow: 3,
+            singleMode: false,
+            internalInputs: false,
+            breakpoints: {
+                960: {
+                    monthsCount: 12,
+                },
+            },
+            filter: {
+                lockDays: function(date) {
+                    if (blockedDates[date]) {
+                        return LOCK_LOCKED;
+                    }
+
+                    return false;
+                },
+                tooltipText: function(days) {
+                    const nights = days - 1;
+                    return this.plural(nights, ['%d ночь', '%d ночи', '%d ночей']).replace('%d', nights);
+                },
             },
         },
         on: {
-            rangeSelect: function(date_from, date_to) {
-                $formDropdown.elements['date_from'].value = this.formatDate(date_from, 'Y-m-d');
-                $formDropdown.elements['date_to'].value = this.formatDate(date_to, 'Y-m-d');
-            },
-            daySelect: function(date_from) {
-                $formDropdown.elements['date_from'].value = date_from.toLocaleDateString();
+            apply: function(date_from, date_to) {
+                $formDropdown.elements['date_from'].value = formatDate(date_from, 'Y-m-d');
+                $formDropdown.elements['date_to'].value = formatDate(date_to, 'Y-m-d');
             },
         },
-        filter: {
-            lockDays: function(date) {
-                if (blockedDates[date]) {
-                    return LOCK_LOCKED;
-                }
-
-                return false;
-            },
-            tooltipText: function(days) {
-                const nights = days - 1;
-                return this.plural(nights, ['%d ночь', '%d ночи', '%d ночей']).replace('%d', nights);
-            }
-        }
     });
 
     dropdown.setBookingDates(generateRandomBookingDates());
