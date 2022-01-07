@@ -774,7 +774,7 @@ DateRangePicker.prototype._filterLockDays = function(date) {
 
     // пользовательские функции
     if (typeof this.options.filter.lockDays == 'function') {
-        return this.options.filter.lockDays.call(date);
+        return this.options.filter.lockDays.call(this, date);
     }
 
     // все дни доступны
