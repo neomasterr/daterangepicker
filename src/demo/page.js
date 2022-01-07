@@ -52,7 +52,6 @@ maxDate.setMonth(maxDate.getMonth() + 12);
 maxDate.setDate(0);
 
 (function() {
-
     const datepicker = new DateRangePicker(document.querySelector('#daterangepicker'), {
         minDate: minDate,
         maxDate: maxDate,
