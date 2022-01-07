@@ -1,6 +1,6 @@
 {
-  "name": "daterangepicker",
-  "version": "1.0.0",
+  "name": "@neomasterr/daterangepicker",
+  "version": "1.0.1",
   "description": "",
   "main": "./src/dist/daterangepicker.js",
   "scripts": {
@@ -9,7 +9,14 @@
     "build": "webpack --mode=production --config=webpack.prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "neomasterr",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/neomasterr/daterangepicker.git"
+  },
+  "author": {
+    "name": "neomasterr",
+    "email": "neomasterr@gmail.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "css-loader": "^5.2.6",
