@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
     entry: {
@@ -14,6 +15,13 @@ module.exports = {
                 umdNamedDefine: true,
             }
         },
+        'demo/page': {
+            import: [
+                './src/demo/page.scss',
+                './src/demo/page.js',
+            ],
+            filename: './demo/page.js',
+        },
     },
     output: {
         filename: '[name].js',
@@ -21,9 +29,18 @@ module.exports = {
         clean: true,
     },
     plugins: [
+        new HtmlWebpackPlugin({
+            filename: './demo/index.html',
+            template: './src/demo/index.html',
+            title: 'DateRangePicker',
+            inject: false,
+        }),
         new MiniCssExtractPlugin({
             filename: '[name].css',
             chunkFilename: '[name].chunk.css',
+        }),
+        new LiveReloadPlugin({
+
         }),
     ],
     module: {

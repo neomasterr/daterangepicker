@@ -9,22 +9,7 @@
     "build": "webpack --mode=production --config=webpack.prod.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "datepicker",
-    "daterangepicker",
-    "date",
-    "range",
-    "daterange",
-    "picker"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/neomasterr/daterangepicker.git"
-  },
-  "author": {
-    "name": "neomasterr",
-    "email": "neomasterr@gmail.com"
-  },
+  "author": "neomasterr",
   "license": "MIT",
   "devDependencies": {
     "css-loader": "^5.2.6",

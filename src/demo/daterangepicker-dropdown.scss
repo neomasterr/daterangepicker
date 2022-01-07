@@ -1,0 +1,139 @@
+@import 'daterangepicker-wrapper';
+
+%dropdown-separated {
+    visibility: hidden;
+    transform: translateY(-8px);
+    opacity: 0;
+
+    &.is-initialized {
+        transition: transform .2s, opacity .2s, visibility .2s;
+    }
+
+    &.is-opened {
+        visibility: visible;
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.Daterangepicker-dropdown {
+    --daterangepicker-day-color: #333333;
+    --daterangepicker-border-radius-big: 10px;
+
+    @extend %dropdown-separated;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    margin-top: 10px;
+    z-index: 5;
+
+    &__wrapper {
+        background-color: #FFFFFF;
+        padding: 24px 25px;
+        box-shadow: 0 8px 22px 0 rgba(0, 0, 0, 0.12);
+        border-radius: var(--daterangepicker-border-radius-big);
+        width: 688px;
+    }
+
+    // мобилка
+    &__header {
+        display: none;
+    }
+
+    // мобилка
+    &__footer {
+        display: none;
+    }
+}
+
+@media (max-width: 960px) {
+    .Daterangepicker-dropdown {
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        margin-top: 0;
+        background-color: #FFFFFF;
+        z-index: 30;
+        visibility: hidden;
+        opacity: 0;
+        transition: all .1s ease-in-out;
+
+        &.is-opened {
+            visibility: visible;
+            opacity: 1;
+
+            .litepicker {
+                visibility: visible;
+                opacity: 1;
+            }
+        }
+
+        &__footer {
+            display: block;
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #FFFFFF;
+            z-index: 5;
+            transform: translateY(100%);
+            transition: transform .2s ease;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.12);
+
+            &.is-active {
+                transform: translateY(0);
+            }
+        }
+
+        &__confirm {
+            padding: 20px;
+
+            &-button {
+                padding: 10px;
+                border-radius: var(--daterangepicker-border-radius-big);
+                background-color: var(--daterangepicker-day-selected-background);
+                cursor: pointer;
+                color: #FFFFFF;
+                text-align: center;
+                font-size: 18px;
+            }
+        }
+
+        &__header {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            background-color: #FFFFFF;
+            height: 60px;
+            border-bottom: 1px solid #D2D2D7;
+
+            &-close {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 50px;
+                height: 50px;
+                cursor: pointer;
+            }
+
+            &-title {
+                margin-top: 4px;
+                margin-left: 10px;
+                color: var(--daterangepicker-day-color);
+            }
+        }
+
+        &__wrapper {
+            width: 100%;
+            height: 100%;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: auto;
+            padding-bottom: 83px;
+        }
+    }
+}
