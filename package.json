@@ -2,7 +2,7 @@
   "name": "daterangepicker",
   "version": "1.0.0",
   "description": "",
-  "main": "./src/js/daterangepicker.js",
+  "main": "./src/dist/daterangepicker.js",
   "scripts": {
     "start": "webpack --mode=development --config=webpack.dev.js --watch",
     "dev": "webpack --mode=development --config=webpack.dev.js",
